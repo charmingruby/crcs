@@ -11,11 +11,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/charmingruby/crcs/services/server/internal/auth"
+	"github.com/charmingruby/crcs/services/server/internal/auth/token"
 	"github.com/charmingruby/crcs/services/server/internal/platform/config"
 	"github.com/charmingruby/crcs/services/server/internal/platform/httpx"
 	"github.com/charmingruby/crcs/services/server/internal/platform/logging"
 	"github.com/charmingruby/crcs/services/server/internal/platform/postgrex"
-	"github.com/charmingruby/crcs/services/server/internal/ticket"
 )
 
 const shutdownTimeout = 30 * time.Second
@@ -53,8 +54,8 @@ func run() error {
 
 	srv, router := httpx.NewServer(cfg.Port)
 
-	if err := ticket.New(router, db); err != nil {
-		log.Error("ticket: module error", "error", err)
+	if err := auth.New(router, db, token.New(cfg.JWTSecret, cfg.JWTTTL)); err != nil {
+		log.Error("auth: module error", "error", err)
 		return err
 	}
 

@@ -7,3 +7,20 @@ type User struct {
 	PasswordHash string `json:"-"             db:"password_hash"`
 	Model        `            db:",inline"`
 }
+
+type UserInput struct {
+	FirstName    string
+	LastName     string
+	Email        string
+	PasswordHash string
+}
+
+func NewUser(input UserInput) *User {
+	return &User{
+		Model:        NewModel(),
+		FirstName:    input.FirstName,
+		LastName:     input.LastName,
+		Email:        input.Email,
+		PasswordHash: input.PasswordHash,
+	}
+}
