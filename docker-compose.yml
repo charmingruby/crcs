@@ -1,0 +1,10 @@
+services:
+  lab-db:
+    container_name: lab-db
+    image: bitnami/postgresql:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=lab
+    ports:
+      - 5432:5432
