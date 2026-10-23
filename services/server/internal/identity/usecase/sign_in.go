@@ -36,7 +36,7 @@ func (u *Usecase) SignIn(
 		return SignInOutput{}, customerr.Unauthorized("invalid credentials", nil)
 	}
 
-	accessToken, err := u.tokens.Sign(user.ID)
+	accessToken, err := u.tokenMgr.Sign(user.ID)
 	if err != nil {
 		return SignInOutput{}, customerr.Internal("could not sign access token", err)
 	}

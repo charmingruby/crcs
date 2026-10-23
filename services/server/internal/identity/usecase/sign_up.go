@@ -48,7 +48,7 @@ func (u *Usecase) SignUp(
 		return SignUpOutput{}, customerr.Integration(err)
 	}
 
-	accessToken, err := u.tokens.Sign(user.ID)
+	accessToken, err := u.tokenMgr.Sign(user.ID)
 	if err != nil {
 		return SignUpOutput{}, customerr.Internal("could not sign access token", err)
 	}

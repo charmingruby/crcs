@@ -95,7 +95,7 @@ func TestSignInV1(t *testing.T) {
 			accessToken, ok := body["access_token"].(string)
 			require.True(t, ok, "expected string access_token in response body")
 
-			userID, err := s.tokens.Verify(accessToken)
+			userID, err := s.tokenMgr.Verify(accessToken)
 			require.NoError(t, err)
 
 			user, err := s.repo.FindByEmail(context.Background(), "jane@example.com")

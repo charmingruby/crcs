@@ -3,7 +3,7 @@ package endpoint
 import (
 	"github.com/go-chi/chi/v5"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/identity/usecase"
 )
 
 type Endpoint struct {

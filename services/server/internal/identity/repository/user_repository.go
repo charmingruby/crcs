@@ -16,8 +16,6 @@ import (
 const (
 	createUserQuery      = "create user"
 	findUserByEmailQuery = "find user by email"
-
-	uniqueViolationCode = "23505"
 )
 
 var userQueries = map[string]string{

@@ -3,7 +3,7 @@ package endpoint
 import (
 	"net/http"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/identity/usecase"
 	"github.com/charmingruby/crcs/services/server/internal/platform/httpx"
 )
 

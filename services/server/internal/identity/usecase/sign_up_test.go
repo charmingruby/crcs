@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/identity/usecase"
 )
 
 func TestSignUp(t *testing.T) {

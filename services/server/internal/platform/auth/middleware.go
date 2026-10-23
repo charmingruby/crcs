@@ -1,4 +1,4 @@
-package middleware
+package auth
 
 import (
 	"context"
@@ -6,13 +6,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/token"
 	"github.com/charmingruby/crcs/services/server/internal/platform/httpx"
 )
 
-type contextKey struct{}
+type tokenContextKey struct{}
 
-func New(tokens *token.Manager) func(http.Handler) http.Handler {
+func WithAuth(tokenMgr *TokenManager) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			raw, ok := bearerToken(r)
@@ -21,13 +20,13 @@ func New(tokens *token.Manager) func(http.Handler) http.Handler {
 				return
 			}
 
-			userID, err := tokens.Verify(raw)
+			userID, err := tokenMgr.Verify(raw)
 			if err != nil {
 				httpx.HandleErr(w, r, customerr.Unauthorized("invalid access token", err))
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), contextKey{}, userID)
+			ctx := context.WithValue(r.Context(), tokenContextKey{}, userID)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -35,7 +34,7 @@ func New(tokens *token.Manager) func(http.Handler) http.Handler {
 }
 
 func UserIDFromContext(ctx context.Context) (string, bool) {
-	userID, ok := ctx.Value(contextKey{}).(string)
+	userID, ok := ctx.Value(tokenContextKey{}).(string)
 
 	return userID, ok && userID != ""
 }

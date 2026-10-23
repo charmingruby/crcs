@@ -14,10 +14,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/http/endpoint"
-	"github.com/charmingruby/crcs/services/server/internal/auth/repository"
-	"github.com/charmingruby/crcs/services/server/internal/auth/token"
-	"github.com/charmingruby/crcs/services/server/internal/auth/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/identity/http/endpoint"
+	"github.com/charmingruby/crcs/services/server/internal/identity/repository"
+	"github.com/charmingruby/crcs/services/server/internal/identity/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/platform/auth"
 	"github.com/charmingruby/crcs/services/server/internal/platform/logging"
 	"github.com/charmingruby/crcs/services/server/test/container"
 )
@@ -30,10 +30,10 @@ func TestMain(m *testing.M) {
 }
 
 type testEndpoint struct {
-	ep     *endpoint.Endpoint
-	uc     *usecase.Usecase
-	repo   *repository.UserRepository
-	tokens *token.Manager
+	ep       *endpoint.Endpoint
+	uc       *usecase.Usecase
+	repo     *repository.UserRepository
+	tokenMgr *auth.TokenManager
 }
 
 func newTestEndpoint(t *testing.T) testEndpoint {
@@ -44,14 +44,14 @@ func newTestEndpoint(t *testing.T) testEndpoint {
 	repo, err := repository.NewUserRepository(db)
 	require.NoError(t, err)
 
-	tokens := token.New(testJWTSecret, time.Hour)
-	uc := usecase.New(repo, tokens)
+	tokenMgr := auth.NewTokenManager(testJWTSecret, time.Hour)
+	uc := usecase.New(repo, tokenMgr)
 
 	return testEndpoint{
-		ep:     endpoint.New(chi.NewRouter(), uc),
-		uc:     uc,
-		repo:   repo,
-		tokens: tokens,
+		ep:       endpoint.New(chi.NewRouter(), uc),
+		uc:       uc,
+		repo:     repo,
+		tokenMgr: tokenMgr,
 	}
 }
 

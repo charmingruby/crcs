@@ -1,4 +1,4 @@
-package token
+package auth
 
 import (
 	"errors"
@@ -10,19 +10,19 @@ import (
 
 var ErrInvalidToken = errors.New("invalid token")
 
-type Manager struct {
+type TokenManager struct {
 	secret []byte
 	ttl    time.Duration
 }
 
-func New(secret string, ttl time.Duration) *Manager {
-	return &Manager{
+func NewTokenManager(secret string, ttl time.Duration) *TokenManager {
+	return &TokenManager{
 		secret: []byte(secret),
 		ttl:    ttl,
 	}
 }
 
-func (m *Manager) Sign(userID string) (string, error) {
+func (m *TokenManager) Sign(userID string) (string, error) {
 	now := time.Now()
 
 	claims := jwt.RegisteredClaims{
@@ -39,7 +39,7 @@ func (m *Manager) Sign(userID string) (string, error) {
 	return signed, nil
 }
 
-func (m *Manager) Verify(raw string) (string, error) {
+func (m *TokenManager) Verify(raw string) (string, error) {
 	claims := &jwt.RegisteredClaims{}
 
 	parsed, err := jwt.ParseWithClaims(

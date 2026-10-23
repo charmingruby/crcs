@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth/repository"
-	"github.com/charmingruby/crcs/services/server/internal/auth/token"
-	"github.com/charmingruby/crcs/services/server/internal/auth/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/identity/repository"
+	"github.com/charmingruby/crcs/services/server/internal/identity/usecase"
+	"github.com/charmingruby/crcs/services/server/internal/platform/auth"
 	"github.com/charmingruby/crcs/services/server/internal/platform/logging"
 	"github.com/charmingruby/crcs/services/server/test/container"
 )
@@ -23,9 +23,9 @@ func TestMain(m *testing.M) {
 }
 
 type testService struct {
-	uc     *usecase.Usecase
-	repo   *repository.UserRepository
-	tokens *token.Manager
+	uc       *usecase.Usecase
+	repo     *repository.UserRepository
+	tokenMgr *auth.TokenManager
 }
 
 func newTestService(t *testing.T) testService {
@@ -36,12 +36,12 @@ func newTestService(t *testing.T) testService {
 	repo, err := repository.NewUserRepository(db)
 	require.NoError(t, err)
 
-	tokens := token.New(testJWTSecret, time.Hour)
+	tokenMgr := auth.NewTokenManager(testJWTSecret, time.Hour)
 
 	return testService{
-		uc:     usecase.New(repo, tokens),
-		repo:   repo,
-		tokens: tokens,
+		uc:       usecase.New(repo, tokenMgr),
+		repo:     repo,
+		tokenMgr: tokenMgr,
 	}
 }
 

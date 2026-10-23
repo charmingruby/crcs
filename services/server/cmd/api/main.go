@@ -11,8 +11,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/charmingruby/crcs/services/server/internal/auth"
-	"github.com/charmingruby/crcs/services/server/internal/auth/token"
+	"github.com/charmingruby/crcs/services/server/internal/identity"
+	"github.com/charmingruby/crcs/services/server/internal/platform/auth"
 	"github.com/charmingruby/crcs/services/server/internal/platform/config"
 	"github.com/charmingruby/crcs/services/server/internal/platform/httpx"
 	"github.com/charmingruby/crcs/services/server/internal/platform/logging"
@@ -52,9 +52,11 @@ func run() error {
 	}
 	log.Info("postgres: connected")
 
+	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.JWTTTL)
+
 	srv, router := httpx.NewServer(cfg.Port)
 
-	if err := auth.New(router, db, token.New(cfg.JWTSecret, cfg.JWTTTL)); err != nil {
+	if err := identity.New(router, db, tokenMgr); err != nil {
 		log.Error("auth: module error", "error", err)
 		return err
 	}
