@@ -1,0 +1,28 @@
+package config
+
+import (
+	"time"
+
+	"github.com/caarlos0/env"
+	"github.com/joho/godotenv"
+)
+
+type Config struct {
+	Port         string        `env:"PORT"          envDefault:"4000"`
+	DatabaseURL  string        `env:"DATABASE_URL"  envDefault:"postgres://postgres:postgres@localhost:5432/lab?sslmode=disable"`
+	JWTSecret    string        `env:"JWT_SECRET"    envDefault:"dev-insecure-secret"`
+	KafkaBrokers []string      `env:"KAFKA_BROKERS" envDefault:"localhost:9092"                                                  envSeparator:","`
+	JWTTTL       time.Duration `env:"JWT_TTL"       envDefault:"24h"`
+}
+
+func Load() (*Config, error) {
+	_ = godotenv.Load()
+
+	var cfg Config
+
+	if err := env.Parse(&cfg); err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
+}

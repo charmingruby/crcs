@@ -1,0 +1,92 @@
+package usecase
+
+import (
+	"context"
+	"time"
+
+	"crcs/core/customerr"
+	"crcs/event/contendersingestv1"
+)
+
+type IngestContendersCartelMatch struct {
+	EventName       string
+	EventDate       time.Time
+	Method          string
+	Outcome         string
+	OpponentName    string
+	WeightClass     string
+	FightDuration   string
+	EventRating     int
+	ScheduledRounds int
+	ActualRounds    int
+}
+
+type IngestContendersContender struct {
+	FirstName          string
+	LastName           string
+	Nickname           string
+	Birthdate          time.Time
+	PlaceOfBirth       string
+	CurrentWeightClass string
+	Gender             string
+	SeasonID           string
+	CartelMatches      []IngestContendersCartelMatch
+	Reach              float64
+	Height             float64
+	Weight             float64
+}
+
+type IngestContendersInput struct {
+	SeasonID   string
+	Contenders []IngestContendersContender
+}
+
+func (u *Usecase) IngestContenders(
+	ctx context.Context,
+	input IngestContendersInput,
+) error {
+
+	contenders := make([]contendersingestv1.Contender, 0, len(input.Contenders))
+
+	for _, c := range input.Contenders {
+		matches := make([]contendersingestv1.CartelMatch, 0, len(c.CartelMatches))
+
+		for _, m := range c.CartelMatches {
+			matches = append(matches, contendersingestv1.CartelMatch{
+				EventName:       m.EventName,
+				EventDate:       m.EventDate.Format(time.RFC3339),
+				Method:          m.Method,
+				Outcome:         m.Outcome,
+				OpponentName:    m.OpponentName,
+				WeightClass:     m.WeightClass,
+				FightDuration:   m.FightDuration,
+				EventRating:     float64(m.EventRating),
+				ScheduledRounds: m.ScheduledRounds,
+				ActualRounds:    m.ActualRounds,
+			})
+		}
+
+		contenders = append(contenders, contendersingestv1.Contender{
+			FirstName:          c.FirstName,
+			LastName:           c.LastName,
+			Nickname:           c.Nickname,
+			Birthdate:          c.Birthdate.Format(time.RFC3339),
+			PlaceOfBirth:       c.PlaceOfBirth,
+			CurrentWeightClass: c.CurrentWeightClass,
+			Gender:             c.Gender,
+			SeasonID:           c.SeasonID,
+			CartelMatches:      matches,
+			Reach:              c.Reach,
+			Height:             c.Height,
+			Weight:             c.Weight,
+		})
+	}
+
+	if err := u.broker.Publish(ctx, input.SeasonID, contendersingestv1.Topic, contendersingestv1.Message{
+		Contenders: contenders,
+	}); err != nil {
+		return customerr.Integration(err)
+	}
+
+	return nil
+}

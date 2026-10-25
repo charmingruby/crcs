@@ -20,3 +20,16 @@ type Contender struct {
 	Status             string           `json:"status"               db:"status"`
 	Model              `            db:",inline"`
 }
+
+type ContenderInput struct {
+	FirstName          string
+	LastName           string
+	Nickname           string
+	Birthdate          time.Time
+	PlaceOfBirth       string
+	CurrentWeightClass string
+	Reach              float64
+	Height             float64
+	Weight             float64
+	Gender             string
+}

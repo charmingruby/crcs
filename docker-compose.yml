@@ -8,3 +8,30 @@ services:
       - POSTGRES_DB=lab
     ports:
       - 5432:5432
+
+  lab-kafka:
+    container_name: lab-kafka
+    image: apache/kafka:latest
+    ports:
+      - 9092:9092
+    environment:
+      # Single-node KRaft: the broker is also its own controller.
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@lab-kafka:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      # INTERNAL (19092) serves in-compose clients; HOST (9092) serves the
+      # app running on the host machine.
+      - KAFKA_LISTENERS=INTERNAL://:19092,HOST://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=INTERNAL://lab-kafka:19092,HOST://localhost:9092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,HOST:PLAINTEXT
+      # Single-broker replication defaults.
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      # Kafka 4.x defaults this to false; keep it on so publishing to a new
+      # topic just works in dev.
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw

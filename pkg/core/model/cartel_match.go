@@ -19,3 +19,16 @@ type CartelMatch struct {
 	ActualRounds    int               `json:"actual_rounds"     db:"actual_rounds"`
 	Model           `              db:",inline"`
 }
+
+type CartelMatchInput struct {
+	EventName       string
+	EventDate       time.Time
+	EventRating     int
+	Method          string
+	Outcome         string
+	OpponentName    string
+	WeightClass     string
+	FightDuration   string
+	ScheduledRounds int
+	ActualRounds    int
+}
