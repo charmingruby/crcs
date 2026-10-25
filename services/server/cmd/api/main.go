@@ -12,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/charmingruby/crcs/services/server/internal/identity"
+	"github.com/charmingruby/crcs/services/server/internal/matchmaking"
 	"github.com/charmingruby/crcs/services/server/internal/platform/auth"
 	"github.com/charmingruby/crcs/services/server/internal/platform/config"
 	"github.com/charmingruby/crcs/services/server/internal/platform/httpx"
@@ -58,6 +59,11 @@ func run() error {
 
 	if err := identity.New(router, db, tokenMgr); err != nil {
 		log.Error("auth: module error", "error", err)
+		return err
+	}
+
+	if err := matchmaking.New(router, db, tokenMgr); err != nil {
+		log.Error("matchmaking: module error", "error", err)
 		return err
 	}
 
