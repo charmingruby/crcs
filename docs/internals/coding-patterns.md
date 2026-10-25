@@ -139,7 +139,7 @@ One file per implemented use case, plus the concrete `Usecase` struct in `usecas
 - ✅ Domain outcomes map: missing → `NotFound`, duplicate → `Conflict`, invalid → `Validation`.
 - ✅ Atomic writes (multi-repo or read-modify-write) go through the transaction manager. See [architecture.md](./architecture.md#transaction-safety).
 - ✅ One `*Usecase` built with `New(...)`, shared by endpoints and public readers.
-- ✅ Non-blocking side effects (e.g. notifier) stay outside the transaction and never fail the usecase — log and continue. Test the failure path with the `memory.go` fake, see [testing.md](./testing.md).
+- ✅ Non-blocking side effects (e.g. notifier) stay outside the transaction and never fail the usecase — log and continue. If you write a test for the failure path, use the `memory.go` fake, see [testing.md](./testing.md).
 - ❌ No interface on the usecase — a single implementation needs no port.
 - ❌ No transport types in the usecase. ❌ No raw storage handle — the concrete repository only.
 

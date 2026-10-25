@@ -1,5 +1,7 @@
 # Testing
 
+> **This is a POC.** Writing tests is optional. Nothing here is a requirement — it is only guidance for when you choose to write a test for a tricky piece of logic. Do not proactively add tests.
+
 ## Philosophy
 
 - **No mocks.** Tests use real implementations. A test that needs a mock is testing the wrong seam.
@@ -20,10 +22,9 @@ Each case needs a fresh, isolated, real golden source. See `test/container/` and
 - External integrations use an in-memory fake with real state. The fake may inject errors for paths that cannot happen otherwise (e.g. "notification failure does not fail the usecase").
 - Infra failures that cannot happen through the real stack are dropped, not faked.
 - A test that needs `time.Sleep` to pass is wrong — it hides a race.
-- Ship focused tests for the behavior you changed.
 
 ## Verifying
 
-- Smallest proof that the change works: run the tests you touched with `go test ./internal/<domain>/... -run TestName -race` (needs a real golden source — container or `TEST_DATABASE_URL`).
+- Smallest proof that the change works: build it (`go build ./...`) and, when there is a test in scope, run it with `go test ./internal/<domain>/... -run TestName -race`.
 - Targeted lint: `task lint` on the scope you changed. Do not run repo-wide lint unless asked.
-- Backend behavior changes ship with focused tests for that behavior.
+- Do not write new tests just to satisfy a checklist.
