@@ -1,0 +1,14 @@
+# temporary files
+tmp
+
+# environment variables
+.env
+
+# non-generic coding agents
+.claude
+
+# binaries
+bin
+
+#macos
+.DS_Store
