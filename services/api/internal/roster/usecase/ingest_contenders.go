@@ -29,11 +29,10 @@ type IngestContendersContender struct {
 	PlaceOfBirth       string
 	CurrentWeightClass string
 	Gender             string
-	SeasonID           string
 	CartelMatches      []IngestContendersCartelMatch
-	Reach              float64
-	Height             float64
-	Weight             float64
+	Reach              int
+	Height             int
+	Weight             int
 }
 
 type IngestContendersInput struct {
@@ -69,7 +68,7 @@ func (u *Usecase) IngestContenders(
 				OpponentName:    m.OpponentName,
 				WeightClass:     m.WeightClass,
 				FightDuration:   m.FightDuration,
-				EventRating:     float64(m.EventRating),
+				EventRating:     m.EventRating,
 				ScheduledRounds: m.ScheduledRounds,
 				ActualRounds:    m.ActualRounds,
 			})
@@ -83,7 +82,6 @@ func (u *Usecase) IngestContenders(
 			PlaceOfBirth:       c.PlaceOfBirth,
 			CurrentWeightClass: c.CurrentWeightClass,
 			Gender:             c.Gender,
-			SeasonID:           c.SeasonID,
 			CartelMatches:      matches,
 			Reach:              c.Reach,
 			Height:             c.Height,
@@ -92,6 +90,7 @@ func (u *Usecase) IngestContenders(
 	}
 
 	if err := u.pub.Publish(ctx, contendersingestv1.Topic, input.SeasonID, contendersingestv1.Message{
+		SeasonID:   input.SeasonID,
 		Contenders: contenders,
 	}); err != nil {
 		return customerr.Internal("failed to publish contendersingestv1 message", err)

@@ -16,7 +16,7 @@ type IngestContendersV1CartelMatch struct {
 	OpponentName    string    `json:"opponent_name"    validate:"required,min=1"`
 	WeightClass     string    `json:"weight_class"     validate:"required,min=1"`
 	FightDuration   string    `json:"fight_duration"   validate:"required,min=1"`
-	EventRating     int       `json:"event_rating"`
+	EventRating     int       `json:"event_rating"     validate:"gte=0,lte=100"`
 	ScheduledRounds int       `json:"scheduled_rounds" validate:"required,min=1"`
 	ActualRounds    int       `json:"actual_rounds"    validate:"required,min=1"`
 }
@@ -29,11 +29,10 @@ type IngestContendersV1Contender struct {
 	PlaceOfBirth       string                          `json:"place_of_birth"       validate:"required,min=1"`
 	CurrentWeightClass string                          `json:"current_weight_class" validate:"required,min=1"`
 	Gender             string                          `json:"gender"               validate:"required,min=1"`
-	SeasonID           string                          `json:"season_id"            validate:"required,min=1"`
 	CartelMatches      []IngestContendersV1CartelMatch `json:"cartel_matches"       validate:"dive"`
-	Reach              float64                         `json:"reach"                validate:"gte=0"`
-	Height             float64                         `json:"height"               validate:"gte=0"`
-	Weight             float64                         `json:"weight"               validate:"gte=0"`
+	Reach              int                             `json:"reach"                validate:"gte=0,lte=100"`
+	Height             int                             `json:"height"               validate:"gte=0,lte=100"`
+	Weight             int                             `json:"weight"               validate:"gte=0,lte=100"`
 }
 
 type IngestContendersV1Request struct {
@@ -86,7 +85,6 @@ func (e *Endpoint) IngestContendersV1(w http.ResponseWriter, r *http.Request) {
 			PlaceOfBirth:       c.PlaceOfBirth,
 			CurrentWeightClass: c.CurrentWeightClass,
 			Gender:             c.Gender,
-			SeasonID:           c.SeasonID,
 			CartelMatches:      matches,
 			Reach:              c.Reach,
 			Height:             c.Height,

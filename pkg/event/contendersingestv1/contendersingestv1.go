@@ -10,7 +10,7 @@ type CartelMatch struct {
 	OpponentName    string
 	WeightClass     string
 	FightDuration   string
-	EventRating     float64
+	EventRating     int
 	ScheduledRounds int
 	ActualRounds    int
 }
@@ -23,13 +23,13 @@ type Contender struct {
 	PlaceOfBirth       string
 	CurrentWeightClass string
 	Gender             string
-	SeasonID           string
 	CartelMatches      []CartelMatch
-	Reach              float64
-	Height             float64
-	Weight             float64
+	Reach              int
+	Height             int
+	Weight             int
 }
 
 type Message struct {
+	SeasonID   string
 	Contenders []Contender
 }
