@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS season_matches (
     position INTEGER NOT NULL,
     weight_class VARCHAR NOT NULL,
     gender VARCHAR NOT NULL,
-    is_main_event BOOLEAN NOT NULL DEFAULT FALSE,
-    is_co_main_event BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT NULL,
     deleted_at TIMESTAMPTZ DEFAULT NULL

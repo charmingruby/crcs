@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS cartels (
     losses_by_tko INTEGER NOT NULL,
     losses_by_sub INTEGER NOT NULL,
     losses_by_dec INTEGER NOT NULL,
-    title_fights INTEGER NOT NULL,
-    main_events INTEGER NOT NULL,
     total_fights INTEGER NOT NULL,
     avg_performance_rating INTEGER NULL,
     last_fight_date TIMESTAMPTZ NULL,

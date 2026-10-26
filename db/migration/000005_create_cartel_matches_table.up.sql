@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS cartel_matches (
     outcome VARCHAR NOT NULL,
     opponent_name VARCHAR NOT NULL,
     weight_class VARCHAR NOT NULL,
-    fight_duration INTEGER NOT NULL,
+    fight_duration VARCHAR NOT NULL,
     scheduled_rounds INTEGER NOT NULL,
     actual_rounds INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
