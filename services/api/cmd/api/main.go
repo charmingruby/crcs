@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"crcs/platform/httpx"
+	"crcs/platform/kafka"
+	"crcs/platform/logging"
+	"crcs/platform/postgrex"
 	"errors"
 	"log/slog"
 	"os"
@@ -15,10 +19,7 @@ import (
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking"
 	"github.com/charmingruby/crcs/services/api/internal/platform/auth"
 	"github.com/charmingruby/crcs/services/api/internal/platform/config"
-	"github.com/charmingruby/crcs/services/api/internal/platform/httpx"
-	"github.com/charmingruby/crcs/services/api/internal/platform/kafka"
-	"github.com/charmingruby/crcs/services/api/internal/platform/logging"
-	"github.com/charmingruby/crcs/services/api/internal/platform/postgrex"
+
 	"github.com/charmingruby/crcs/services/api/internal/roster"
 )
 

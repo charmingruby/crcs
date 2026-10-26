@@ -2,11 +2,10 @@ package broker
 
 import (
 	"context"
+	"crcs/platform/kafka"
+	"crcs/platform/logging"
 	"encoding/json/v2"
 	"fmt"
-
-	"github.com/charmingruby/crcs/services/api/internal/platform/kafka"
-	"github.com/charmingruby/crcs/services/api/internal/platform/logging"
 )
 
 type Kafka struct {

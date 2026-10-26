@@ -3,10 +3,9 @@ package auth
 import (
 	"context"
 	"crcs/core/customerr"
+	"crcs/platform/httpx"
 	"net/http"
 	"strings"
-
-	"github.com/charmingruby/crcs/services/api/internal/platform/httpx"
 )
 
 type tokenContextKey struct{}

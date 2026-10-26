@@ -1,11 +1,11 @@
 package endpoint
 
 import (
+	"crcs/platform/httpx"
 	"net/http"
 	"time"
 
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/usecase"
-	"github.com/charmingruby/crcs/services/api/internal/platform/httpx"
 )
 
 type CreateSeasonV1Request struct {

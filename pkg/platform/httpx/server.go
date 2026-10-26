@@ -2,13 +2,12 @@ package httpx
 
 import (
 	"context"
+	"crcs/platform/logging"
 	"errors"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-
-	"github.com/charmingruby/crcs/services/api/internal/platform/logging"
 )
 
 type Server struct {

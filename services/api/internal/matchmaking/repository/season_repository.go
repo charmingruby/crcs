@@ -9,8 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
-
-	"github.com/charmingruby/crcs/services/api/internal/platform/postgrex"
+	"crcs/platform/postgrex"
 )
 
 const (

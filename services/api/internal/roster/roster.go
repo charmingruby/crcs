@@ -1,10 +1,12 @@
 package roster
 
 import (
+	"crcs/platform/kafka"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/charmingruby/crcs/services/api/internal/platform/auth"
-	"github.com/charmingruby/crcs/services/api/internal/platform/kafka"
+
 	"github.com/charmingruby/crcs/services/api/internal/roster/client/broker"
 	"github.com/charmingruby/crcs/services/api/internal/roster/http/endpoint"
 	"github.com/charmingruby/crcs/services/api/internal/roster/usecase"

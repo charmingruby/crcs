@@ -1,10 +1,10 @@
 package endpoint
 
 import (
+	"crcs/platform/httpx"
 	"net/http"
 	"time"
 
-	"github.com/charmingruby/crcs/services/api/internal/platform/httpx"
 	"github.com/charmingruby/crcs/services/api/internal/roster/usecase"
 )
 

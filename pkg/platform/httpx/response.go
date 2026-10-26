@@ -2,11 +2,10 @@ package httpx
 
 import (
 	"crcs/core/customerr"
+	"crcs/platform/logging"
 	"encoding/json"
 	"errors"
 	"net/http"
-
-	"github.com/charmingruby/crcs/services/api/internal/platform/logging"
 )
 
 type ErrorResponse struct {

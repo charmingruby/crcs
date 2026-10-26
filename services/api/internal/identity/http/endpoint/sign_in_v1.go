@@ -1,10 +1,10 @@
 package endpoint
 
 import (
+	"crcs/platform/httpx"
 	"net/http"
 
 	"github.com/charmingruby/crcs/services/api/internal/identity/usecase"
-	"github.com/charmingruby/crcs/services/api/internal/platform/httpx"
 )
 
 type SignInV1Request struct {
