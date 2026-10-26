@@ -11,13 +11,8 @@
   - [ ] PATCH /seasons/:id/contender/:cid
   - [ ] GET /seasons/:id/matchmaking
 
-- [ ] Codebase improvements
+- [ ] Codebase improvements (Performance, organization, etc)
 
 - [ ] Idempotency, retries, resilience
 
 - [ ] AI Integration
-
-- [ ] Usecases with AI Integration
-  - [ ] GET /seasons/:id/suggestions?status=pending
-  - [ ] PATCH /seasons/:id/suggestions/:sid/accept
-  - [ ] PATCH /seasons/:id/suggestions/:sid/rejected
