@@ -31,7 +31,8 @@ func (k *Kafka[T]) Listen(
 
 		var event T
 		if err := json.Unmarshal(m.Value, &event); err != nil {
-			log.Error("unable to parse message: %s", err.Error(),
+			log.Error("unable to parse message",
+				"error", err,
 				"topic", m.Topic,
 			)
 
@@ -39,7 +40,8 @@ func (k *Kafka[T]) Listen(
 		}
 
 		if err := handler(ctx, event); err != nil {
-			log.Error("unable to handle message: %s", err.Error(),
+			log.Error("unable to handle message",
+				"error", err,
 				"topic", m.Topic,
 			)
 

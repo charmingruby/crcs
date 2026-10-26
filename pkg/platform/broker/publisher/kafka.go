@@ -23,7 +23,8 @@ func (k *Kafka) Publish(ctx context.Context, topic, key string, event any) error
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		log.Error("unable to parse message: %s", err.Error(),
+		log.Error("unable to marshal event",
+			"error", err,
 			"topic", topic,
 		)
 
@@ -35,7 +36,8 @@ func (k *Kafka) Publish(ctx context.Context, topic, key string, event any) error
 		Key:   []byte(key),
 		Value: value,
 	}); err != nil {
-		log.Error("unable to publish message: %s", err.Error(),
+		log.Error("unable to publish message",
+			"error", err,
 			"topic", topic,
 		)
 

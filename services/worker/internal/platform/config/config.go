@@ -7,8 +7,8 @@ import (
 
 type Config struct {
 	DatabaseURL  string   `env:"DATABASE_URL"  envDefault:"postgres://postgres:postgres@localhost:5432/lab?sslmode=disable"`
-	KafkaBrokers []string `env:"KAFKA_BROKERS" envDefault:"localhost:9092"                                                  envSeparator:","`
 	ServiceName  string   `env:"SERVICE_NAME"  envDefault:"crcs-worker"`
+	KafkaBrokers []string `env:"KAFKA_BROKERS" envDefault:"localhost:9092"                                                  envSeparator:","`
 }
 
 func Load() (*Config, error) {
