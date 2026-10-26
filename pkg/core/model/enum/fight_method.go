@@ -9,3 +9,13 @@ const (
 	DecisionFightMethod   FightMethod = "DEC"
 	NoContestFightMethod  FightMethod = "NOC"
 )
+
+func (m FightMethod) Valid() bool {
+	switch m {
+	case SubmissionFightMethod, KOFightMethod, TKOFightMethod,
+		DecisionFightMethod, NoContestFightMethod:
+		return true
+	default:
+		return false
+	}
+}
