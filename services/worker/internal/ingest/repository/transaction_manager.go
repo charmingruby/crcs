@@ -1,14 +1,18 @@
 package repository
 
 import (
+	"context"
+
 	"crcs/platform/postgrex"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Transaction struct {
-	ContenderRepository *ContenderRepository
-	TaskRepository      *TaskRepository
+	ContenderRepository   *ContenderRepository
+	CartelRepository      *CartelRepository
+	CartelMatchRepository *CartelMatchRepository
+	TaskRepository        *TaskRepository
 }
 
 type TransactionManager struct {
@@ -19,9 +23,19 @@ func NewTransactionManager(db *sqlx.DB) *TransactionManager {
 	return &TransactionManager{db: db}
 }
 
-func (t *TransactionManager) Transact(fn func(Transaction) error) error {
-	return postgrex.RunInTx(t.db, func(tx *sqlx.Tx) error {
+func (t *TransactionManager) Transact(ctx context.Context, fn func(Transaction) error) error {
+	return postgrex.RunInTx(ctx, t.db, func(tx *sqlx.Tx) error {
 		contenderRepo, err := NewContenderRepository(tx)
+		if err != nil {
+			return err
+		}
+
+		cartelRepo, err := NewCartelRepository(tx)
+		if err != nil {
+			return err
+		}
+
+		cartelMatchRepo, err := NewCartelMatchRepository(tx)
 		if err != nil {
 			return err
 		}
@@ -32,8 +46,10 @@ func (t *TransactionManager) Transact(fn func(Transaction) error) error {
 		}
 
 		return fn(Transaction{
-			ContenderRepository: contenderRepo,
-			TaskRepository:      taskRepo,
+			ContenderRepository:   contenderRepo,
+			CartelRepository:      cartelRepo,
+			CartelMatchRepository: cartelMatchRepo,
+			TaskRepository:        taskRepo,
 		})
 	})
 }
