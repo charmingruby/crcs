@@ -18,3 +18,7 @@ CREATE TABLE IF NOT EXISTS contenders (
 );
 
 CREATE INDEX IF NOT EXISTS idx_contenders_season_id ON contenders (season_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uidx_contenders_name_season
+    ON contenders (first_name, last_name, season_id)
+    WHERE deleted_at IS NULL;

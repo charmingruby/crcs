@@ -25,6 +25,10 @@ func (k *Kafka[T]) Listen(
 	return k.reader.Consume(ctx, func(ctx context.Context, m kafka.Message) error {
 		log := logging.LoggerFromContext(ctx)
 
+		log.Info("message received",
+			"topic", m.Topic,
+		)
+
 		var event T
 		if err := json.Unmarshal(m.Value, &event); err != nil {
 			log.Error("unable to parse message: %s", err.Error(),

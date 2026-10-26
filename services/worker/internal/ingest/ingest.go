@@ -7,12 +7,19 @@ import (
 )
 
 func New(db *sqlx.DB) (*usecase.Usecase, error) {
+	taskRepo, err := repository.NewTaskRepository(db)
+	if err != nil {
+		return nil, err
+	}
+
 	contenderRepo, err := repository.NewContenderRepository(db)
 	if err != nil {
 		return nil, err
 	}
 
-	uc := usecase.New(contenderRepo)
+	txManager := repository.NewTransactionManager(db)
+
+	uc := usecase.New(taskRepo, contenderRepo, txManager)
 
 	return uc, nil
 }

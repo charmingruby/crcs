@@ -8,6 +8,7 @@ import (
 
 type Transaction struct {
 	ContenderRepository *ContenderRepository
+	TaskRepository      *TaskRepository
 }
 
 type TransactionManager struct {
@@ -25,8 +26,14 @@ func (t *TransactionManager) Transact(fn func(Transaction) error) error {
 			return err
 		}
 
+		taskRepo, err := NewTaskRepository(tx)
+		if err != nil {
+			return err
+		}
+
 		return fn(Transaction{
 			ContenderRepository: contenderRepo,
+			TaskRepository:      taskRepo,
 		})
 	})
 }
