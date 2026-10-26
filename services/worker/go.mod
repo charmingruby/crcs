@@ -3,6 +3,7 @@ module github.com/charmingruby/crcs/services/worker
 go 1.27.0
 
 require (
+	crcs/core v0.0.0-00010101000000-000000000000
 	crcs/event v0.0.0-00010101000000-000000000000
 	crcs/platform v0.0.0
 	github.com/caarlos0/env v3.5.0+incompatible

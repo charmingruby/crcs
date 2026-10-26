@@ -55,7 +55,11 @@ func run() error {
 
 	log.Info("postgres: connected")
 
-	handlers := ingest.New()
+	handlers, err := ingest.New(db)
+	if err != nil {
+		log.Error("ingest: module error", "error", err)
+		return err
+	}
 
 	shutdownErrCh := make(chan error, 1)
 

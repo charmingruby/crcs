@@ -1,7 +1,13 @@
 package usecase
 
-type Usecase struct{}
+import "github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
 
-func New() *Usecase {
-	return &Usecase{}
+type Usecase struct {
+	contenderRepo *repository.ContenderRepository
+}
+
+func New(contenderRepo *repository.ContenderRepository) *Usecase {
+	return &Usecase{
+		contenderRepo: contenderRepo,
+	}
 }
