@@ -21,8 +21,8 @@ const (
 var taskQueries = map[string]string{
 	createTaskQuery: `
 		INSERT INTO tasks
-		(id, type, status, total_records, processed_records, failed_records, attempt_count, error_message, started_at, finished_at, created_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+		(id, type, metadata, status, total_records, processed_records, failed_records, attempt_count, error_message, started_at, finished_at, created_at)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
 	findTaskByIDQuery: `
 		SELECT * FROM tasks
 		WHERE
@@ -31,16 +31,17 @@ var taskQueries = map[string]string{
 	updateTaskQuery: `
 		UPDATE tasks SET
 			status=$1,
-			total_records=$2,
-			processed_records=$3,
-			failed_records=$4,
-			attempt_count=$5,
-			error_message=$6,
-			started_at=$7,
-			finished_at=$8,
-			updated_at=$9
+			metadata=$2,
+			total_records=$3,
+			processed_records=$4,
+			failed_records=$5,
+			attempt_count=$6,
+			error_message=$7,
+			started_at=$8,
+			finished_at=$9,
+			updated_at=$10
 		WHERE
-			id=$10 AND
+			id=$11 AND
 			deleted_at IS NULL`,
 }
 
@@ -92,6 +93,7 @@ func (r *TaskRepository) Create(ctx context.Context, task *model.Task) error {
 	_, err = stmt.ExecContext(ctx,
 		task.ID,
 		task.Type,
+		task.Metadata,
 		task.Status,
 		task.TotalRecords,
 		task.ProcessedRecords,
@@ -141,6 +143,7 @@ func (r *TaskRepository) Update(ctx context.Context, task *model.Task) error {
 
 	_, err = stmt.ExecContext(ctx,
 		task.Status,
+		task.Metadata,
 		task.TotalRecords,
 		task.ProcessedRecords,
 		task.FailedRecords,
