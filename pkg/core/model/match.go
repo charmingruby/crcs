@@ -10,7 +10,5 @@ type Match struct {
 	UnderdogContenderID string           `json:"underdog_contender_id"  db:"underdog_contender_id"`
 	WeightClass         enum.WeightClass `json:"weight_class"           db:"weight_class"`
 	Gender              *enum.Gender     `json:"gender"                 db:"gender"`
-	IsMainEvent         bool             `json:"is_main_event"          db:"is_main_event"`
-	IsCoMainEvent       bool             `json:"is_co_main_event"       db:"is_co_main_event"`
 	Model               `             db:",inline"`
 }
