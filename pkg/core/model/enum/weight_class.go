@@ -12,3 +12,13 @@ const (
 	LightHeavyweight WeightClass = "Light Heavyweight"
 	Heavyweight      WeightClass = "Heavyweight"
 )
+
+func (w WeightClass) Valid() bool {
+	switch w {
+	case Flyweight, Bantamweight, Featherweight, Lightweight,
+		Welterweight, Middleweight, LightHeavyweight, Heavyweight:
+		return true
+	default:
+		return false
+	}
+}

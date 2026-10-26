@@ -9,6 +9,15 @@ const (
 	FailedTaskStatus    TaskStatus = "failed"
 )
 
+func (s TaskStatus) Valid() bool {
+	switch s {
+	case PendingTaskStatus, RunningTaskStatus, CompletedTaskStatus, FailedTaskStatus:
+		return true
+	default:
+		return false
+	}
+}
+
 func (s TaskStatus) CanTransitionTo(target TaskStatus) bool {
 	switch s {
 	case PendingTaskStatus:
