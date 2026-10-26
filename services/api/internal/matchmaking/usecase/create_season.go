@@ -18,7 +18,7 @@ func (u *Usecase) CreateSeason(
 ) (CreateSeasonOutput, error) {
 	existing, err := u.seasonRepo.FindByName(ctx, input.Name)
 	if err != nil {
-		return CreateSeasonOutput{}, customerr.Integration(err)
+		return CreateSeasonOutput{}, customerr.Internal("failed to find season by name", err)
 	}
 
 	if existing != nil {
@@ -31,7 +31,7 @@ func (u *Usecase) CreateSeason(
 	}
 
 	if err := u.seasonRepo.Create(ctx, season); err != nil {
-		return CreateSeasonOutput{}, customerr.Integration(err)
+		return CreateSeasonOutput{}, customerr.Internal("failed to create season", err)
 	}
 
 	return CreateSeasonOutput{

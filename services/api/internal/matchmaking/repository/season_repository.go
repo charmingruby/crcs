@@ -15,6 +15,7 @@ import (
 const (
 	createSeasonQuery     = "create season"
 	findSeasonByNameQuery = "find season by name"
+	findSeasonByIDQuery   = "find season by id"
 )
 
 var seasonQueries = map[string]string{
@@ -27,6 +28,11 @@ var seasonQueries = map[string]string{
 		WHERE
 			name=$1 AND
 			deleted_at IS NULL`,
+	findSeasonByIDQuery: `
+				SELECT * FROM seasons
+				WHERE
+					id=$1 AND
+					deleted_at IS NULL`,
 }
 
 type SeasonRepository struct {
@@ -100,6 +106,27 @@ func (r *SeasonRepository) FindByName(ctx context.Context, name string) (*model.
 
 	var season model.Season
 	if err := stmt.QueryRowxContext(ctx, name).StructScan(&season); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &season, nil
+}
+
+func (r *SeasonRepository) FindByID(ctx context.Context, id string) (*model.Season, error) {
+	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
+	defer cancel()
+
+	stmt, err := r.statement(findSeasonByIDQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	var season model.Season
+	if err := stmt.QueryRowxContext(ctx, id).StructScan(&season); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}

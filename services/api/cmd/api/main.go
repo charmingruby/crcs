@@ -79,7 +79,13 @@ func run() error {
 		return err
 	}
 
-	if err := roster.New(router, pub, tokenMgr); err != nil {
+	seasonReader, err := matchmaking.NewSeasonReader(db)
+	if err != nil {
+		log.Error("matchmaking: season reader error", "error", err)
+		return err
+	}
+
+	if err := roster.New(router, pub, seasonReader, tokenMgr); err != nil {
 		log.Error("roster: module error", "error", err)
 		return err
 	}

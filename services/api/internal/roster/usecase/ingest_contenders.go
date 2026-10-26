@@ -45,6 +45,15 @@ func (u *Usecase) IngestContenders(
 	ctx context.Context,
 	input IngestContendersInput,
 ) error {
+	exists, err := u.seasonReader.SeasonExists(ctx, input.SeasonID)
+
+	if err != nil {
+		return customerr.Internal("failed to validate if season exists", err)
+	}
+
+	if !exists {
+		return customerr.NotFound("season not found")
+	}
 
 	contenders := make([]contendersingestv1.Contender, 0, len(input.Contenders))
 
@@ -85,7 +94,7 @@ func (u *Usecase) IngestContenders(
 	if err := u.pub.Publish(ctx, contendersingestv1.Topic, input.SeasonID, contendersingestv1.Message{
 		Contenders: contenders,
 	}); err != nil {
-		return customerr.Integration(err)
+		return customerr.Internal("failed to publish contendersingestv1 message", err)
 	}
 
 	return nil

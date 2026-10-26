@@ -22,7 +22,7 @@ func (u *Usecase) SignIn(
 ) (SignInOutput, error) {
 	user, err := u.userRepo.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return SignInOutput{}, customerr.Integration(err)
+		return SignInOutput{}, customerr.Internal("failed to find user by email", err)
 	}
 
 	if user == nil {

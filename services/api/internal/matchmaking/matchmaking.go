@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/http/endpoint"
+	"github.com/charmingruby/crcs/services/api/internal/matchmaking/public"
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/repository"
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/usecase"
 	"github.com/charmingruby/crcs/services/api/internal/platform/auth"
@@ -25,4 +26,15 @@ func New(
 	endpoint.New(r, uc, tokenMgr)
 
 	return nil
+}
+
+func NewSeasonReader(db *sqlx.DB) (*public.SeasonReader, error) {
+	seasonRepo, err := repository.NewSeasonRepository(db)
+	if err != nil {
+		return nil, err
+	}
+
+	uc := usecase.New(seasonRepo)
+
+	return public.NewSeasonReader(uc), nil
 }

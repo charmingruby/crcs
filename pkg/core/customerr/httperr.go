@@ -3,7 +3,8 @@ package customerr
 import "net/http"
 
 type HTTPError struct {
-	OriginalError Error
+	OriginalError error
+	Type          ErrorType
 	Message       string
 	Status        int
 }
@@ -16,7 +17,8 @@ var UnhandledHTTPError = HTTPError{
 func MapToHTTP(err Error) HTTPError {
 	httpErr := HTTPError{
 		Message:       err.Message,
-		OriginalError: err,
+		OriginalError: err.Err,
+		Type:          err.Type,
 	}
 
 	switch err.Type {
@@ -32,7 +34,7 @@ func MapToHTTP(err Error) HTTPError {
 	case TypeUnauthorized:
 		httpErr.Status = http.StatusUnauthorized
 		return httpErr
-	case TypeInternal, TypeIntegration:
+	case TypeInternal:
 		httpErr.Status = http.StatusInternalServerError
 		httpErr.Message = "Internal Server Error"
 		return httpErr

@@ -25,7 +25,7 @@ func (u *Usecase) SignUp(
 ) (SignUpOutput, error) {
 	existing, err := u.userRepo.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return SignUpOutput{}, customerr.Integration(err)
+		return SignUpOutput{}, customerr.Internal("failed to find user by email", err)
 	}
 
 	if existing != nil {
@@ -45,7 +45,7 @@ func (u *Usecase) SignUp(
 	})
 
 	if err := u.userRepo.Create(ctx, user); err != nil {
-		return SignUpOutput{}, customerr.Integration(err)
+		return SignUpOutput{}, customerr.Internal("failed to create user", err)
 	}
 
 	accessToken, err := u.tokenMgr.Sign(user.ID)

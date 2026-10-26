@@ -38,10 +38,16 @@ func HandleErr(w http.ResponseWriter, r *http.Request, err error) {
 	if cerr, ok := errors.AsType[*customerr.Error](err); ok {
 		httpErr := customerr.MapToHTTP(*cerr)
 
-		log.Warn("application error",
-			"type", httpErr.OriginalError.Type,
+		err := cerr.Unwrap()
+		originalErrMsg := ""
+		if err != nil {
+			originalErrMsg = err.Error()
+		}
+
+		log.Error("application error",
+			"type", httpErr.Type,
 			"message", httpErr.Message,
-			"original_error", httpErr.OriginalError.Error(),
+			"original_error", originalErrMsg,
 		)
 
 		writeResponse(w, httpErr.Status, ErrorResponse{
