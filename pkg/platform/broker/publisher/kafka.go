@@ -1,10 +1,10 @@
-package broker
+package publisher
 
 import (
 	"context"
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
-	"encoding/json/v2"
+	"encoding/json"
 	"fmt"
 )
 

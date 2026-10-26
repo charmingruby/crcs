@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crcs/platform/broker/publisher"
 	"crcs/platform/httpx"
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
@@ -57,8 +58,12 @@ func run() error {
 	log.Info("postgres: connected")
 
 	log.Info("kafka: creating producer...")
+
 	kafkaWriter := kafka.NewWriter(cfg.KafkaBrokers)
+
 	log.Info("kafka: producer created")
+
+	pub := publisher.NewKafka(kafkaWriter)
 
 	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.JWTTTL)
 
@@ -74,7 +79,7 @@ func run() error {
 		return err
 	}
 
-	if err := roster.New(router, kafkaWriter, tokenMgr); err != nil {
+	if err := roster.New(router, pub, tokenMgr); err != nil {
 		log.Error("roster: module error", "error", err)
 		return err
 	}

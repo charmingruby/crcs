@@ -82,7 +82,7 @@ func (u *Usecase) IngestContenders(
 		})
 	}
 
-	if err := u.broker.Publish(ctx, contendersingestv1.Topic, input.SeasonID, contendersingestv1.Message{
+	if err := u.pub.Publish(ctx, contendersingestv1.Topic, input.SeasonID, contendersingestv1.Message{
 		Contenders: contenders,
 	}); err != nil {
 		return customerr.Integration(err)

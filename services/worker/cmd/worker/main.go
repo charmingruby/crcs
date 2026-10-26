@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crcs/event/contendersingestv1"
+	"crcs/platform/broker/listener"
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
 	"crcs/platform/postgrex"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/charmingruby/crcs/services/worker/internal/ingest"
-	"github.com/charmingruby/crcs/services/worker/internal/ingest/client/listener"
 	"github.com/charmingruby/crcs/services/worker/internal/platform/config"
 	"github.com/jmoiron/sqlx"
 )
