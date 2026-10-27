@@ -4,7 +4,7 @@
   - [x] POST /auth/sign-up
   - [x] POST /auth/sign-in
   - [x] POST /seasons
-  - [ ] POST /seasons/:id/contenders/ingest
+  - [x] POST /seasons/:id/contenders/ingest
   - [ ] POST /seasons/:id/matchmaking
   - [ ] PATCH /seasons/:id
   - [ ] POST /seasons/:id/match/:mid/result
