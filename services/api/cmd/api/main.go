@@ -74,7 +74,7 @@ func run() error {
 		return err
 	}
 
-	if err := matchmaking.New(router, db, tokenMgr); err != nil {
+	if err := matchmaking.New(router, db, pub, tokenMgr); err != nil {
 		log.Error("matchmaking: module error", "error", err)
 		return err
 	}

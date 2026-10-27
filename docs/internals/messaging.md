@@ -88,7 +88,7 @@ One package per consumed event, versioned in the folder and package name:
 - `New` validates what it can at boot (state machine, required dependencies) so bad wiring fails startup, not the first message.
 - The listener package never owns the wire type and never imports the broker SDK — the adapter decodes and calls `Handle`.
 
-Listener only → keep it flat, no wrapper. HTTP and a queue in the same module → both move under `delivery/` (`delivery/http/`, `delivery/queue/` with the listener packages inside). See [architecture.md](./architecture.md#delivery-mechanism-layout).
+Listener only → keep it flat, no wrapper. HTTP and an inbound listener in the same module → both move under `delivery/` (`delivery/http/`, `delivery/queue/` with the listener packages inside). A publisher alone does not trigger the split: an HTTP-only module that publishes stays flat (`http/`). See [architecture.md](./architecture.md#delivery-mechanism-layout).
 
 ```go
 type Listener struct {

@@ -61,11 +61,11 @@ Concrete reader over a usecase for cross-domain reads; consumer owns the interfa
 
 #### Flat layout
 
-Default: one mechanism, no wrapper. `http/endpoint/` with route registration in `New`, or `listener/on_<event>_v<n>/` for queue-only. Rule: [architecture.md](./architecture.md#delivery-mechanism-layout)
+Default: one inbound mechanism, no wrapper. `http/endpoint/` with route registration in `New`, or `listener/on_<event>_v<n>/` for queue-only. An outbound publisher keeps the module flat. Rule: [architecture.md](./architecture.md#delivery-mechanism-layout)
 
 #### Nested layout
 
-Two or more mechanisms under `delivery/` — e.g. `delivery/http/` + `delivery/queue/`. Only exists when a second transport appears. Rule: [architecture.md](./architecture.md#delivery-mechanism-layout)
+Two or more inbound mechanisms under `delivery/` — e.g. `delivery/http/` + `delivery/queue/`. Only exists when a second inbound transport appears. Rule: [architecture.md](./architecture.md#delivery-mechanism-layout)
 
 #### Listener
 

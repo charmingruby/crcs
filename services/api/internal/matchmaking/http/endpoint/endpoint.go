@@ -20,6 +20,7 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 		r.Use(auth.WithAuth(tokenMgr))
 
 		r.Post("/", ep.CreateSeasonV1)
+		r.Post("/{id}/matchmaking", ep.StartMatchmakingV1)
 	})
 
 	return ep

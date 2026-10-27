@@ -66,11 +66,11 @@ endpoint → usecase → repository (concrete golden source)
 A mechanism is any transport the domain speaks:
 
 - **One mechanism**: flat, no `delivery/` wrapper. HTTP only → `internal/<domain>/http/`; listener only → `internal/<domain>/listener/`.
-- **Two or more mechanisms**: nested — `delivery/` becomes the parent and every mechanism moves inside it: `delivery/http/` beside `delivery/queue/` (listener packages inside), or `delivery/grpc/`. Create it only when a second mechanism appears.
+- **Two or more mechanisms**: nested — `delivery/` becomes the parent and every mechanism moves inside it: `delivery/http/` beside `delivery/queue/` (listener packages inside), or `delivery/grpc/`. Create it only when a second **inbound** mechanism appears; an outbound publisher does not count.
 
 Everything bound to a transport (DTOs, protos, endpoints, listeners, event schemas) lives in its own mechanism folder and is wired in `<domain>/<domain>.go`.
 
-**Messaging is always a delivery mechanism.** A queue is a transport in both directions — a consumer is inbound (listens, like HTTP receives requests), a producer is outbound (delivers events to another system). Both count toward the `delivery/` split: a domain that speaks HTTP and a queue keeps both under `delivery/` (`delivery/http/` + `delivery/queue/`). Messaging never becomes a `client` integration.
+**Messaging is always a delivery mechanism, but only inbound traffic triggers the `delivery/` split.** A consumer is inbound (listens, like HTTP receives requests) and counts as a transport. A producer is outbound (delivers events to another system) and stays injected as the `Publisher` port in the usecase — it does not receive traffic, so it never moves the module under `delivery/`. A domain that serves HTTP and consumes a queue keeps both under `delivery/` (`delivery/http/` + `delivery/queue/`); a domain that serves HTTP and only publishes stays flat (`http/`). Messaging never becomes a `client` integration.
 
 Inbound consumers are called **listeners** and are registered in `main`, one goroutine per topic. Shape and rules: [messaging.md](./messaging.md).
 

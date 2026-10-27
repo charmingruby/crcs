@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crcs/event/contenders_ingest_v1"
+	"crcs/event/season_matchmaking_v1"
 	"crcs/platform/broker/listener"
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
@@ -15,6 +16,7 @@ import (
 	"syscall"
 
 	"github.com/charmingruby/crcs/services/worker/internal/ingest"
+	"github.com/charmingruby/crcs/services/worker/internal/matchmaking"
 	"github.com/charmingruby/crcs/services/worker/internal/platform/config"
 	"github.com/jmoiron/sqlx"
 )
@@ -52,9 +54,15 @@ func run() error {
 
 	log.Info("postgres: connected")
 
-	listeners, err := ingest.New(db)
+	ingestListners, err := ingest.New(db)
 	if err != nil {
 		log.Error("ingest: module error", "error", err)
+		return err
+	}
+
+	matchmakingListeners, err := matchmaking.New(db)
+	if err != nil {
+		log.Error("matchmaking: module error", "error", err)
 		return err
 	}
 
@@ -69,10 +77,29 @@ func run() error {
 			cfg.KafkaBrokers,
 			contenders_ingest_v1.Topic,
 			cfg.ServiceName,
-		)).Listen(ctx, listeners.OnContendersIngestV1.Handle); err != nil {
+		)).Listen(ctx, ingestListners.OnContendersIngestV1.Handle); err != nil {
 			log.Error("listener: error on consuming messages",
 				"error", err,
 				"topic", contenders_ingest_v1.Topic,
+			)
+
+			shutdownErrCh <- err
+		}
+	}()
+
+	go func() {
+		log.Info("listener: started consuming messages",
+			"topic", season_matchmaking_v1.Topic,
+		)
+
+		if err := listener.NewKafka[season_matchmaking_v1.Message](kafka.NewReader(
+			cfg.KafkaBrokers,
+			season_matchmaking_v1.Topic,
+			cfg.ServiceName,
+		)).Listen(ctx, matchmakingListeners.OnSeasonMatchmakingV1.Handle); err != nil {
+			log.Error("listener: error on consuming messages",
+				"error", err,
+				"topic", season_matchmaking_v1.Topic,
 			)
 
 			shutdownErrCh <- err
