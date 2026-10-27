@@ -17,3 +17,20 @@ func (s ContenderStatus) Valid() bool {
 		return false
 	}
 }
+
+func (s ContenderStatus) CanTransitionTo(next ContenderStatus) bool {
+	if s == next {
+		return s.Valid()
+	}
+
+	switch s {
+	case IdleContenderStatus:
+		return next == ActiveContenderStatus || next == ContractedContenderStatus || next == RejectedContenderStatus
+	case ActiveContenderStatus:
+		return next == ContractedContenderStatus || next == RejectedContenderStatus
+	case ContractedContenderStatus, RejectedContenderStatus:
+		return next == ContractedContenderStatus || next == RejectedContenderStatus
+	default:
+		return false
+	}
+}

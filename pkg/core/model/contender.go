@@ -2,14 +2,17 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"crcs/core/model/enum"
 )
 
 var (
-	ErrInvalidContenderWeightClass = errors.New("invalid contender weight class")
-	ErrInvalidContenderGender      = errors.New("invalid contender gender")
+	ErrInvalidContenderWeightClass      = errors.New("invalid contender weight class")
+	ErrInvalidContenderGender           = errors.New("invalid contender gender")
+	ErrInvalidContenderStatus           = errors.New("invalid contender status")
+	ErrInvalidContenderStatusTransition = errors.New("invalid contender status transition")
 )
 
 type Contender struct {
@@ -68,6 +71,23 @@ func NewContender(input ContenderInput) (*Contender, error) {
 		SeasonID:           input.SeasonID,
 		Status:             enum.ActiveContenderStatus,
 	}, nil
+}
+
+// UpdateStatus transitions the contender to a new status.
+func (c *Contender) UpdateStatus(status enum.ContenderStatus) error {
+	if !status.Valid() {
+		return ErrInvalidContenderStatus
+	}
+
+	if !c.Status.CanTransitionTo(status) {
+		return fmt.Errorf("%w: %s -> %s", ErrInvalidContenderStatusTransition, c.Status, status)
+	}
+
+	c.Touch(func(*Model) {
+		c.Status = status
+	})
+
+	return nil
 }
 
 func (c *Contender) FullName() string {

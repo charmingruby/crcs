@@ -6,11 +6,13 @@
   - [x] POST /seasons
   - [x] POST /seasons/:id/contenders/ingest
   - [x] POST /seasons/:id/matchmaking
-  - [ ] PATCH /seasons/:id
-  - [ ] POST /seasons/:id/match/:mid/result
-  - [ ] PATCH /seasons/:id/contender/:cid
+  - [x] PATCH /seasons/:id
+  - [x] POST /seasons/:id/match/:mid/result
+  - [x] PATCH /seasons/:id/contenders/:cid
 
 - [ ] Codebase improvements (Performance, organization, etc)
+
+- [ ] Messages should be in pb
 
 - [ ] Idempotency, retries, resilience
 

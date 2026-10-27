@@ -19,5 +19,8 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 	r.With(auth.WithAuth(tokenMgr)).
 		Post("/v1/seasons/{id}/contenders/ingest", ep.IngestContendersV1)
 
+	r.With(auth.WithAuth(tokenMgr)).
+		Patch("/v1/seasons/{id}/contenders/{cid}", ep.UpdateContenderStatusV1)
+
 	return ep
 }
