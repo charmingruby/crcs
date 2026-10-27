@@ -8,12 +8,18 @@ import (
 
 type Usecase struct {
 	seasonRepo *repository.SeasonRepository
+	txManager  *repository.TransactionManager
 	pub        broker.Publisher
 }
 
-func New(seasonRepo *repository.SeasonRepository, pub broker.Publisher) *Usecase {
+func New(
+	seasonRepo *repository.SeasonRepository,
+	txManager *repository.TransactionManager,
+	pub broker.Publisher,
+) *Usecase {
 	return &Usecase{
 		seasonRepo: seasonRepo,
+		txManager:  txManager,
 		pub:        pub,
 	}
 }

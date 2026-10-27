@@ -24,21 +24,22 @@ func New(
 		return err
 	}
 
-	uc := usecase.New(seasonRepo, pub)
+	txManager := repository.NewTransactionManager(db)
+
+	uc := usecase.New(seasonRepo, txManager, pub)
 
 	endpoint.New(r, uc, tokenMgr)
 
 	return nil
 }
 
-// NewSeasonReader builds the cross-domain reader. It never publishes.
 func NewSeasonReader(db *sqlx.DB) (*public.SeasonReader, error) {
 	seasonRepo, err := repository.NewSeasonRepository(db)
 	if err != nil {
 		return nil, err
 	}
 
-	uc := usecase.New(seasonRepo, nil)
+	uc := usecase.New(seasonRepo, repository.NewTransactionManager(db), nil)
 
 	return public.NewSeasonReader(uc), nil
 }

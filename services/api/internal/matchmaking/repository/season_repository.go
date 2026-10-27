@@ -14,6 +14,7 @@ import (
 
 const (
 	createSeasonQuery     = "create season"
+	updateSeasonQuery     = "update season"
 	findSeasonByNameQuery = "find season by name"
 	findSeasonByIDQuery   = "find season by id"
 )
@@ -23,6 +24,17 @@ var seasonQueries = map[string]string{
 		INSERT INTO seasons
 		(id, name, status, weeks, start_at, created_at)
 		VALUES($1, $2, $3, $4, $5, $6)`,
+	updateSeasonQuery: `
+		UPDATE seasons
+		SET
+			name=$1,
+			status=$2,
+			weeks=$3,
+			start_at=$4,
+			updated_at=$5
+		WHERE
+			id=$6 AND
+			deleted_at IS NULL`,
 	findSeasonByNameQuery: `
 		SELECT * FROM seasons
 		WHERE
@@ -87,6 +99,30 @@ func (r *SeasonRepository) Create(ctx context.Context, season *model.Season) err
 		season.Weeks,
 		season.StartAt,
 		season.CreatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *SeasonRepository) Update(ctx context.Context, season *model.Season) error {
+	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
+	defer cancel()
+
+	stmt, err := r.statement(updateSeasonQuery)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.ExecContext(ctx,
+		season.Name,
+		season.Status,
+		season.Weeks,
+		season.StartAt,
+		season.UpdatedAt,
+		season.ID,
 	)
 	if err != nil {
 		return err
