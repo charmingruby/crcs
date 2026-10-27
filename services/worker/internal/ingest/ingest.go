@@ -6,7 +6,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// Listeners exposes every event consumed by the ingest module.
 type Listeners struct {
 	OnContendersIngestV1 *on_contenders_ingest_v1.Listener
 }

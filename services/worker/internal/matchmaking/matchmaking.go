@@ -7,7 +7,6 @@ import (
 	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
 )
 
-// Listeners exposes every event consumed by the matchmaking module.
 type Listeners struct {
 	OnSeasonMatchmakingV1 *on_season_matchmaking_v1.Listener
 }
