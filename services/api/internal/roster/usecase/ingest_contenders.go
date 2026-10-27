@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"crcs/core/customerr"
-	"crcs/event/contendersingestv1"
+	"crcs/event/contenders_ingest_v1"
 )
 
 type IngestContendersCartelMatch struct {
@@ -54,13 +54,13 @@ func (u *Usecase) IngestContenders(
 		return customerr.NotFound("season not found")
 	}
 
-	contenders := make([]contendersingestv1.Contender, 0, len(input.Contenders))
+	contenders := make([]contenders_ingest_v1.Contender, 0, len(input.Contenders))
 
 	for _, c := range input.Contenders {
-		matches := make([]contendersingestv1.CartelMatch, 0, len(c.CartelMatches))
+		matches := make([]contenders_ingest_v1.CartelMatch, 0, len(c.CartelMatches))
 
 		for _, m := range c.CartelMatches {
-			matches = append(matches, contendersingestv1.CartelMatch{
+			matches = append(matches, contenders_ingest_v1.CartelMatch{
 				EventName:       m.EventName,
 				EventDate:       m.EventDate.Format(time.RFC3339),
 				Method:          m.Method,
@@ -74,7 +74,7 @@ func (u *Usecase) IngestContenders(
 			})
 		}
 
-		contenders = append(contenders, contendersingestv1.Contender{
+		contenders = append(contenders, contenders_ingest_v1.Contender{
 			FirstName:          c.FirstName,
 			LastName:           c.LastName,
 			Nickname:           c.Nickname,
@@ -89,11 +89,11 @@ func (u *Usecase) IngestContenders(
 		})
 	}
 
-	if err := u.pub.Publish(ctx, contendersingestv1.Topic, input.SeasonID, contendersingestv1.Message{
+	if err := u.pub.Publish(ctx, contenders_ingest_v1.Topic, input.SeasonID, contenders_ingest_v1.Message{
 		SeasonID:   input.SeasonID,
 		Contenders: contenders,
 	}); err != nil {
-		return customerr.Internal("failed to publish contendersingestv1 message", err)
+		return customerr.Internal("failed to publish contenders_ingest_v1 message", err)
 	}
 
 	return nil

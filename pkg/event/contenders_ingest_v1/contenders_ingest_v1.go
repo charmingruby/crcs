@@ -1,4 +1,4 @@
-package contendersingestv1
+package contenders_ingest_v1
 
 const Topic = "contenders.ingest"
 
