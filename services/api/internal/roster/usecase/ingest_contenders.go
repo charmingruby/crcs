@@ -24,7 +24,7 @@ type IngestContendersCartelMatch struct {
 type IngestContendersContender struct {
 	FirstName          string
 	LastName           string
-	Nickname           string
+	Nickname           *string
 	Birthdate          time.Time
 	PlaceOfBirth       string
 	CurrentWeightClass string

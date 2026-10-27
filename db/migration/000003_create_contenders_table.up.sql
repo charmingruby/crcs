@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS contenders (
     id VARCHAR PRIMARY KEY,
     first_name VARCHAR NOT NULL,
     last_name VARCHAR NOT NULL,
-    nickname VARCHAR NOT NULL,
+    nickname VARCHAR DEFAULT NULL,
     birthdate TIMESTAMPTZ NOT NULL,
     place_of_birth VARCHAR NOT NULL,
     current_weight_class VARCHAR NOT NULL,

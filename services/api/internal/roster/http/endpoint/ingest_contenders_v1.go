@@ -24,7 +24,7 @@ type IngestContendersV1CartelMatch struct {
 type IngestContendersV1Contender struct {
 	FirstName          string                          `json:"first_name"           validate:"required,min=1"`
 	LastName           string                          `json:"last_name"            validate:"required,min=1"`
-	Nickname           string                          `json:"nickname"             validate:"required,min=1"`
+	Nickname           *string                         `json:"nickname"             validate:"omitempty,min=1"`
 	Birthdate          time.Time                       `json:"birthdate"            validate:"required"`
 	PlaceOfBirth       string                          `json:"place_of_birth"       validate:"required,min=1"`
 	CurrentWeightClass string                          `json:"current_weight_class" validate:"required,oneof=flyweight bantamweight featherweight lightweight welterweight middleweight light_heavyweight heavyweight"`

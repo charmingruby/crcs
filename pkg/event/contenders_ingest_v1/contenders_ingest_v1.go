@@ -18,7 +18,7 @@ type CartelMatch struct {
 type Contender struct {
 	FirstName          string
 	LastName           string
-	Nickname           string
+	Nickname           *string
 	Birthdate          string
 	PlaceOfBirth       string
 	CurrentWeightClass string

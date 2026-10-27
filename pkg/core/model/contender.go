@@ -15,7 +15,7 @@ var (
 type Contender struct {
 	FirstName          string               `json:"first_name"           db:"first_name"`
 	LastName           string               `json:"last_name"            db:"last_name"`
-	Nickname           string               `json:"nickname"             db:"nickname"`
+	Nickname           *string              `json:"nickname"             db:"nickname"`
 	Birthdate          time.Time            `json:"birthdate"            db:"birthdate"`
 	PlaceOfBirth       string               `json:"place_of_birth"       db:"place_of_birth"`
 	CurrentWeightClass enum.WeightClass     `json:"current_weight_class" db:"current_weight_class"`
@@ -31,7 +31,7 @@ type Contender struct {
 type ContenderInput struct {
 	FirstName          string
 	LastName           string
-	Nickname           string
+	Nickname           *string
 	Birthdate          time.Time
 	PlaceOfBirth       string
 	CurrentWeightClass string
