@@ -9,7 +9,6 @@
   - [ ] PATCH /seasons/:id
   - [ ] POST /seasons/:id/match/:mid/result
   - [ ] PATCH /seasons/:id/contender/:cid
-  - [ ] GET /seasons/:id/matchmaking
 
 - [ ] Codebase improvements (Performance, organization, etc)
 
