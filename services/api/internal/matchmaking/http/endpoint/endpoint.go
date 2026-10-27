@@ -22,6 +22,7 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 		r.Post("/", ep.CreateSeasonV1)
 		r.Patch("/{id}", ep.UpdateSeasonV1)
 		r.Post("/{id}/matchmaking", ep.StartMatchmakingV1)
+		r.Post("/{id}/match/{mid}/result", ep.RecordMatchResultV1)
 	})
 
 	return ep

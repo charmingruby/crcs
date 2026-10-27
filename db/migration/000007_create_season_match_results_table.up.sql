@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS season_match_results (
     id VARCHAR PRIMARY KEY,
     match_id VARCHAR NOT NULL UNIQUE REFERENCES season_matches(id),
     winner_id VARCHAR DEFAULT NULL REFERENCES contenders(id),
+    outcome VARCHAR NOT NULL,
     method VARCHAR NOT NULL,
     fight_duration INTEGER NOT NULL,
     scheduled_rounds INTEGER NOT NULL,

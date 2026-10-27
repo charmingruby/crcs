@@ -9,7 +9,9 @@ import (
 )
 
 type Transaction struct {
-	SeasonRepository *SeasonRepository
+	SeasonRepository      *SeasonRepository
+	MatchRepository       *MatchRepository
+	MatchResultRepository *MatchResultRepository
 }
 
 type TransactionManager struct {
@@ -27,8 +29,20 @@ func (t *TransactionManager) Transact(ctx context.Context, fn func(Transaction) 
 			return err
 		}
 
+		matchRepo, err := NewMatchRepository(tx)
+		if err != nil {
+			return err
+		}
+
+		matchResultRepo, err := NewMatchResultRepository(tx)
+		if err != nil {
+			return err
+		}
+
 		return fn(Transaction{
-			SeasonRepository: seasonRepo,
+			SeasonRepository:      seasonRepo,
+			MatchRepository:       matchRepo,
+			MatchResultRepository: matchResultRepo,
 		})
 	})
 }
