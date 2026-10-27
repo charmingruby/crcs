@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"crcs/event/contendersingestv1"
+	"crcs/event/contenders_ingest_v1"
 	"crcs/platform/broker/listener"
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
@@ -13,14 +13,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/charmingruby/crcs/services/worker/internal/ingest"
 	"github.com/charmingruby/crcs/services/worker/internal/platform/config"
 	"github.com/jmoiron/sqlx"
 )
-
-const shutdownTimeout = 30 * time.Second
 
 func main() {
 	if err := run(); err != nil {
@@ -55,7 +52,7 @@ func run() error {
 
 	log.Info("postgres: connected")
 
-	handlers, err := ingest.New(db)
+	listeners, err := ingest.New(db)
 	if err != nil {
 		log.Error("ingest: module error", "error", err)
 		return err
@@ -65,17 +62,17 @@ func run() error {
 
 	go func() {
 		log.Info("listener: started consuming messages",
-			"topic", contendersingestv1.Topic,
+			"topic", contenders_ingest_v1.Topic,
 		)
 
-		if err := listener.NewKafka[contendersingestv1.Message](kafka.NewReader(
+		if err := listener.NewKafka[contenders_ingest_v1.Message](kafka.NewReader(
 			cfg.KafkaBrokers,
-			contendersingestv1.Topic,
+			contenders_ingest_v1.Topic,
 			cfg.ServiceName,
-		)).Listen(ctx, handlers.IngestContenders); err != nil {
+		)).Listen(ctx, listeners.OnContendersIngestV1.Handle); err != nil {
 			log.Error("listener: error on consuming messages",
 				"error", err,
-				"topic", contendersingestv1.Topic,
+				"topic", contenders_ingest_v1.Topic,
 			)
 
 			shutdownErrCh <- err
@@ -83,7 +80,6 @@ func run() error {
 	}()
 
 	go shutdown(ctx, log, shutdownErrCh, db)
-	<-shutdownErrCh
 
 	if err := <-shutdownErrCh; err != nil {
 		log.Error("shutdown: shutdown error", "error", err)

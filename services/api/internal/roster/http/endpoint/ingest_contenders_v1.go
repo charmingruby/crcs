@@ -10,11 +10,11 @@ import (
 
 type IngestContendersV1CartelMatch struct {
 	EventName       string    `json:"event_name"       validate:"required,min=1"`
-	EventDate       time.Time `json:"event_date"       validate:"required,min=1"`
-	Method          string    `json:"method"           validate:"required,min=1"`
-	Outcome         string    `json:"outcome"          validate:"required,min=1"`
+	EventDate       time.Time `json:"event_date"       validate:"required"`
+	Method          string    `json:"method"           validate:"required,oneof=SUB KO TKO DEC NOC"`
+	Outcome         string    `json:"outcome"          validate:"required,oneof=W L D NC"`
 	OpponentName    string    `json:"opponent_name"    validate:"required,min=1"`
-	WeightClass     string    `json:"weight_class"     validate:"required,min=1"`
+	WeightClass     string    `json:"weight_class"     validate:"required,oneof=flyweight bantamweight featherweight lightweight welterweight middleweight light_heavyweight heavyweight"`
 	FightDuration   string    `json:"fight_duration"   validate:"required,min=1"`
 	EventRating     int       `json:"event_rating"     validate:"gte=0,lte=100"`
 	ScheduledRounds int       `json:"scheduled_rounds" validate:"required,min=1"`
@@ -25,18 +25,18 @@ type IngestContendersV1Contender struct {
 	FirstName          string                          `json:"first_name"           validate:"required,min=1"`
 	LastName           string                          `json:"last_name"            validate:"required,min=1"`
 	Nickname           string                          `json:"nickname"             validate:"required,min=1"`
-	Birthdate          time.Time                       `json:"birthdate"            validate:"required,min=1"`
+	Birthdate          time.Time                       `json:"birthdate"            validate:"required"`
 	PlaceOfBirth       string                          `json:"place_of_birth"       validate:"required,min=1"`
-	CurrentWeightClass string                          `json:"current_weight_class" validate:"required,min=1"`
-	Gender             string                          `json:"gender"               validate:"required,min=1"`
+	CurrentWeightClass string                          `json:"current_weight_class" validate:"required,oneof=flyweight bantamweight featherweight lightweight welterweight middleweight light_heavyweight heavyweight"`
+	Gender             string                          `json:"gender"               validate:"required,oneof=M F"`
 	CartelMatches      []IngestContendersV1CartelMatch `json:"cartel_matches"       validate:"dive"`
-	Reach              int                             `json:"reach"                validate:"gte=0,lte=100"`
-	Height             int                             `json:"height"               validate:"gte=0,lte=100"`
-	Weight             int                             `json:"weight"               validate:"gte=0,lte=100"`
+	Reach              int                             `json:"reach"                validate:"gt=0,lte=250"`
+	Height             int                             `json:"height"               validate:"gt=0,lte=250"`
+	Weight             int                             `json:"weight"               validate:"gt=0,lte=250"`
 }
 
 type IngestContendersV1Request struct {
-	Contenders []IngestContendersV1Contender `json:"contenders"`
+	Contenders []IngestContendersV1Contender `json:"contenders" validate:"required,min=1,dive"`
 }
 
 type IngestContendersV1Response struct {

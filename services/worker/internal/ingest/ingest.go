@@ -1,25 +1,30 @@
 package ingest
 
 import (
+	"github.com/charmingruby/crcs/services/worker/internal/ingest/listener/on_contenders_ingest_v1"
 	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
-	"github.com/charmingruby/crcs/services/worker/internal/ingest/usecase"
 	"github.com/jmoiron/sqlx"
 )
 
-func New(db *sqlx.DB) (*usecase.Usecase, error) {
-	taskRepo, err := repository.NewTaskRepository(db)
-	if err != nil {
-		return nil, err
-	}
+// Listeners exposes every event consumed by the ingest module.
+type Listeners struct {
+	OnContendersIngestV1 *on_contenders_ingest_v1.Listener
+}
 
-	contenderRepo, err := repository.NewContenderRepository(db)
+func New(db *sqlx.DB) (*Listeners, error) {
+	taskRepo, err := repository.NewTaskRepository(db)
 	if err != nil {
 		return nil, err
 	}
 
 	txManager := repository.NewTransactionManager(db)
 
-	uc := usecase.New(taskRepo, contenderRepo, txManager)
+	contendersIngest, err := on_contenders_ingest_v1.New(taskRepo, txManager)
+	if err != nil {
+		return nil, err
+	}
 
-	return uc, nil
+	return &Listeners{
+		OnContendersIngestV1: contendersIngest,
+	}, nil
 }

@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -12,21 +10,25 @@ import (
 	"crcs/platform/postgrex"
 )
 
-const (
-	createContenderQuery                    = "create contender"
-	findContenderByFullNameAndSeasonIDQuery = "find contender by full name and season_id"
-)
+const upsertContenderQuery = "upsert contender"
 
 var contenderQueries = map[string]string{
-	createContenderQuery: `
+	upsertContenderQuery: `
 		INSERT INTO contenders
 		(id, first_name, last_name, nickname, birthdate, place_of_birth, current_weight_class, reach, height, weight, gender, season_id, status, created_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-	findContenderByFullNameAndSeasonIDQuery: `
-		SELECT * FROM contenders
-		WHERE
-			first_name=$1 AND last_name=$2 AND season_id=$3 AND
-			deleted_at IS NULL`,
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+		ON CONFLICT (first_name, last_name, season_id) WHERE deleted_at IS NULL
+		DO UPDATE SET
+			nickname = EXCLUDED.nickname,
+			birthdate = EXCLUDED.birthdate,
+			place_of_birth = EXCLUDED.place_of_birth,
+			current_weight_class = EXCLUDED.current_weight_class,
+			reach = EXCLUDED.reach,
+			height = EXCLUDED.height,
+			weight = EXCLUDED.weight,
+			gender = EXCLUDED.gender,
+			updated_at = now()
+		RETURNING id`,
 }
 
 type ContenderRepository struct {
@@ -65,16 +67,17 @@ func (r *ContenderRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	return stmt, nil
 }
 
-func (r *ContenderRepository) Create(ctx context.Context, contender *model.Contender) error {
+func (r *ContenderRepository) Upsert(ctx context.Context, contender *model.Contender) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
 	defer cancel()
 
-	stmt, err := r.statement(createContenderQuery)
+	stmt, err := r.statement(upsertContenderQuery)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	_, err = stmt.ExecContext(ctx,
+	var id string
+	if err := stmt.QueryRowxContext(ctx,
 		contender.ID,
 		contender.FirstName,
 		contender.LastName,
@@ -89,31 +92,9 @@ func (r *ContenderRepository) Create(ctx context.Context, contender *model.Conte
 		contender.SeasonID,
 		contender.Status,
 		contender.CreatedAt,
-	)
-	if err != nil {
-		return err
+	).Scan(&id); err != nil {
+		return "", err
 	}
 
-	return nil
-}
-
-func (r *ContenderRepository) FindByFullNameAndSeasonID(ctx context.Context, firstName, lastName, seasonID string) (*model.Contender, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(findContenderByFullNameAndSeasonIDQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	var contender model.Contender
-	if err := stmt.QueryRowxContext(ctx, firstName, lastName, seasonID).StructScan(&contender); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-
-		return nil, err
-	}
-
-	return &contender, nil
+	return id, nil
 }
