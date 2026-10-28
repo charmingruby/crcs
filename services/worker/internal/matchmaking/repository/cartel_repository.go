@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/core/model/enum"
@@ -25,57 +22,21 @@ var cartelQueries = map[string]string{
 }
 
 type CartelRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewCartelRepository(db postgrex.Querier) (*CartelRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(cartelQueries))
-
-	for queryName, query := range cartelQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, cartelQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &CartelRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *CartelRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &CartelRepository{stmts: stmts}, nil
 }
 
 func (r *CartelRepository) FindBySeasonID(
 	ctx context.Context,
 	seasonID string,
 ) ([]*model.Cartel, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(findCartelsBySeasonIDQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	cartels := make([]*model.Cartel, 0)
-	if err := stmt.SelectContext(ctx, &cartels, seasonID, enum.ActiveContenderStatus); err != nil {
-		return nil, err
-	}
-
-	return cartels, nil
+	return postgrex.Many[*model.Cartel](ctx, r.stmts, findCartelsBySeasonIDQuery, seasonID, enum.ActiveContenderStatus)
 }

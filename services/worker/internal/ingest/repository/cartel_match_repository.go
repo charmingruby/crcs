@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/platform/postgrex"
@@ -26,61 +23,25 @@ var cartelMatchQueries = map[string]string{
 }
 
 type CartelMatchRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewCartelMatchRepository(db postgrex.Querier) (*CartelMatchRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(cartelMatchQueries))
-
-	for queryName, query := range cartelMatchQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, cartelMatchQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &CartelMatchRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *CartelMatchRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &CartelMatchRepository{stmts: stmts}, nil
 }
 
 func (r *CartelMatchRepository) Replace(ctx context.Context, cartelID string, matches []*model.CartelMatch) error {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	deleteStmt, err := r.statement(deleteCartelMatchesByCartelIDQuery)
-	if err != nil {
-		return err
-	}
-
-	if _, err := deleteStmt.ExecContext(ctx, cartelID); err != nil {
-		return err
-	}
-
-	createStmt, err := r.statement(createCartelMatchQuery)
-	if err != nil {
+	if err := postgrex.Exec(ctx, r.stmts, deleteCartelMatchesByCartelIDQuery, cartelID); err != nil {
 		return err
 	}
 
 	for _, match := range matches {
-		if _, err := createStmt.ExecContext(ctx,
+		if err := postgrex.Exec(ctx, r.stmts, createCartelMatchQuery,
 			match.ID,
 			cartelID,
 			match.EventName,

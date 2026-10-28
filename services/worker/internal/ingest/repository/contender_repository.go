@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/platform/postgrex"
@@ -32,52 +29,20 @@ var contenderQueries = map[string]string{
 }
 
 type ContenderRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewContenderRepository(db postgrex.Querier) (*ContenderRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(contenderQueries))
-
-	for queryName, query := range contenderQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, contenderQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &ContenderRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *ContenderRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &ContenderRepository{stmts: stmts}, nil
 }
 
 func (r *ContenderRepository) Upsert(ctx context.Context, contender *model.Contender) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(upsertContenderQuery)
-	if err != nil {
-		return "", err
-	}
-
-	var id string
-	if err := stmt.QueryRowxContext(ctx,
+	return postgrex.ExecReturning[string](ctx, r.stmts, upsertContenderQuery,
 		contender.ID,
 		contender.FirstName,
 		contender.LastName,
@@ -92,9 +57,5 @@ func (r *ContenderRepository) Upsert(ctx context.Context, contender *model.Conte
 		contender.SeasonID,
 		contender.Status,
 		contender.CreatedAt,
-	).Scan(&id); err != nil {
-		return "", err
-	}
-
-	return id, nil
+	)
 }

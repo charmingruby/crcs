@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/platform/postgrex"
@@ -39,52 +36,20 @@ var cartelQueries = map[string]string{
 }
 
 type CartelRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewCartelRepository(db postgrex.Querier) (*CartelRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(cartelQueries))
-
-	for queryName, query := range cartelQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, cartelQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &CartelRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *CartelRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &CartelRepository{stmts: stmts}, nil
 }
 
 func (r *CartelRepository) Upsert(ctx context.Context, cartel *model.Cartel) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(upsertCartelQuery)
-	if err != nil {
-		return "", err
-	}
-
-	var id string
-	if err := stmt.QueryRowxContext(ctx,
+	return postgrex.ExecReturning[string](ctx, r.stmts, upsertCartelQuery,
 		cartel.ID,
 		cartel.ContenderID,
 		cartel.Wins,
@@ -103,9 +68,5 @@ func (r *CartelRepository) Upsert(ctx context.Context, cartel *model.Cartel) (st
 		cartel.LastFightDate,
 		cartel.TotalFights,
 		cartel.CreatedAt,
-	).Scan(&id); err != nil {
-		return "", err
-	}
-
-	return id, nil
+	)
 }

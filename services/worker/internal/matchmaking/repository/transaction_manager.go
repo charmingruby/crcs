@@ -6,11 +6,13 @@ import (
 	"crcs/platform/postgrex"
 
 	"github.com/jmoiron/sqlx"
+
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Transaction struct {
 	MatchRepository *MatchRepository
-	TaskRepository  *TaskRepository
+	TaskRepository  *task.Repository
 }
 
 type TransactionManager struct {
@@ -28,7 +30,7 @@ func (t *TransactionManager) Transact(ctx context.Context, fn func(Transaction) 
 			return err
 		}
 
-		taskRepo, err := NewTaskRepository(tx)
+		taskRepo, err := task.NewRepository(tx)
 		if err != nil {
 			return err
 		}

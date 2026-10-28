@@ -12,7 +12,6 @@ type Transaction struct {
 	ContenderRepository   *ContenderRepository
 	CartelRepository      *CartelRepository
 	CartelMatchRepository *CartelMatchRepository
-	TaskRepository        *TaskRepository
 }
 
 type TransactionManager struct {
@@ -40,16 +39,10 @@ func (t *TransactionManager) Transact(ctx context.Context, fn func(Transaction) 
 			return err
 		}
 
-		taskRepo, err := NewTaskRepository(tx)
-		if err != nil {
-			return err
-		}
-
 		return fn(Transaction{
 			ContenderRepository:   contenderRepo,
 			CartelRepository:      cartelRepo,
 			CartelMatchRepository: cartelMatchRepo,
-			TaskRepository:        taskRepo,
 		})
 	})
 }

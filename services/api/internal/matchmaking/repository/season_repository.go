@@ -2,11 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/platform/postgrex"
@@ -41,58 +36,27 @@ var seasonQueries = map[string]string{
 			name=$1 AND
 			deleted_at IS NULL`,
 	findSeasonByIDQuery: `
-				SELECT * FROM seasons
-				WHERE
-					id=$1 AND
-					deleted_at IS NULL`,
+		SELECT * FROM seasons
+		WHERE
+			id=$1 AND
+			deleted_at IS NULL`,
 }
 
 type SeasonRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewSeasonRepository(db postgrex.Querier) (*SeasonRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(seasonQueries))
-
-	for queryName, query := range seasonQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, seasonQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &SeasonRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *SeasonRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &SeasonRepository{stmts: stmts}, nil
 }
 
 func (r *SeasonRepository) Create(ctx context.Context, season *model.Season) error {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(createSeasonQuery)
-	if err != nil {
-		return err
-	}
-
-	_, err = stmt.ExecContext(ctx,
+	return postgrex.Exec(ctx, r.stmts, createSeasonQuery,
 		season.ID,
 		season.Name,
 		season.Status,
@@ -100,23 +64,10 @@ func (r *SeasonRepository) Create(ctx context.Context, season *model.Season) err
 		season.StartAt,
 		season.CreatedAt,
 	)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (r *SeasonRepository) Update(ctx context.Context, season *model.Season) error {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(updateSeasonQuery)
-	if err != nil {
-		return err
-	}
-
-	_, err = stmt.ExecContext(ctx,
+	return postgrex.Exec(ctx, r.stmts, updateSeasonQuery,
 		season.Name,
 		season.Status,
 		season.Weeks,
@@ -124,51 +75,12 @@ func (r *SeasonRepository) Update(ctx context.Context, season *model.Season) err
 		season.UpdatedAt,
 		season.ID,
 	)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (r *SeasonRepository) FindByName(ctx context.Context, name string) (*model.Season, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(findSeasonByNameQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	var season model.Season
-	if err := stmt.QueryRowxContext(ctx, name).StructScan(&season); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-
-		return nil, err
-	}
-
-	return &season, nil
+	return postgrex.One[model.Season](ctx, r.stmts, findSeasonByNameQuery, name)
 }
 
 func (r *SeasonRepository) FindByID(ctx context.Context, id string) (*model.Season, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(findSeasonByIDQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	var season model.Season
-	if err := stmt.QueryRowxContext(ctx, id).StructScan(&season); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-
-		return nil, err
-	}
-
-	return &season, nil
+	return postgrex.One[model.Season](ctx, r.stmts, findSeasonByIDQuery, id)
 }

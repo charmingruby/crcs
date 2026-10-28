@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/core/model/enum"
@@ -24,57 +21,27 @@ var contenderQueries = map[string]string{
 }
 
 type ContenderRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewContenderRepository(db postgrex.Querier) (*ContenderRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(contenderQueries))
-
-	for queryName, query := range contenderQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, contenderQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &ContenderRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *ContenderRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &ContenderRepository{stmts: stmts}, nil
 }
 
 func (r *ContenderRepository) FindActiveBySeasonID(
 	ctx context.Context,
 	seasonID string,
 ) ([]*model.Contender, error) {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultReadTimeout)
-	defer cancel()
-
-	stmt, err := r.statement(findActiveContendersBySeasonIDQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	contenders := make([]*model.Contender, 0)
-	if err := stmt.SelectContext(ctx, &contenders, seasonID, enum.ActiveContenderStatus); err != nil {
-		return nil, err
-	}
-
-	return contenders, nil
+	return postgrex.Many[*model.Contender](
+		ctx,
+		r.stmts,
+		findActiveContendersBySeasonIDQuery,
+		seasonID,
+		enum.ActiveContenderStatus,
+	)
 }

@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
 
 	"crcs/core/model"
 	"crcs/platform/postgrex"
@@ -31,39 +28,16 @@ var matchQueries = map[string]string{
 }
 
 type MatchRepository struct {
-	db    postgrex.Querier
-	stmts map[string]*sqlx.Stmt
+	stmts *postgrex.Statements
 }
 
 func NewMatchRepository(db postgrex.Querier) (*MatchRepository, error) {
-	stmts := make(map[string]*sqlx.Stmt, len(matchQueries))
-
-	for queryName, query := range matchQueries {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			return nil, fmt.Errorf("%w (%s): %s",
-				postgrex.ErrQueryPreparation,
-				queryName,
-				err.Error(),
-			)
-		}
-
-		stmts[queryName] = stmt
+	stmts, err := postgrex.Prepare(db, matchQueries)
+	if err != nil {
+		return nil, err
 	}
 
-	return &MatchRepository{
-		db:    db,
-		stmts: stmts,
-	}, nil
-}
-
-func (r *MatchRepository) statement(queryName string) (*sqlx.Stmt, error) {
-	stmt, ok := r.stmts[queryName]
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", postgrex.ErrQueryPreparation, queryName)
-	}
-
-	return stmt, nil
+	return &MatchRepository{stmts: stmts}, nil
 }
 
 func (r *MatchRepository) ReplaceBySeason(
@@ -71,25 +45,12 @@ func (r *MatchRepository) ReplaceBySeason(
 	seasonID string,
 	matches []*model.Match,
 ) error {
-	ctx, cancel := context.WithTimeout(ctx, postgrex.DefaultWriteTimeout)
-	defer cancel()
-
-	deleteStmt, err := r.statement(deleteSeasonMatchesQuery)
-	if err != nil {
-		return err
-	}
-
-	if _, err := deleteStmt.ExecContext(ctx, seasonID); err != nil {
-		return err
-	}
-
-	createStmt, err := r.statement(createSeasonMatchQuery)
-	if err != nil {
+	if err := postgrex.Exec(ctx, r.stmts, deleteSeasonMatchesQuery, seasonID); err != nil {
 		return err
 	}
 
 	for _, match := range matches {
-		if _, err := createStmt.ExecContext(ctx,
+		if err := postgrex.Exec(ctx, r.stmts, createSeasonMatchQuery,
 			match.ID,
 			match.SeasonID,
 			match.FavoriteContenderID,
