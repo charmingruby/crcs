@@ -1,0 +1,10 @@
+.git
+.github
+docs
+db
+
+**/.env
+**/tmp
+**/bin
+**/node_modules
+**/*.log
