@@ -12,10 +12,10 @@ import (
 )
 
 type UpdateSeasonInput struct {
-	ID      string
 	Name    *string
 	Status  *enum.SeasonStatus
 	StartAt *time.Time
+	ID      string
 }
 
 func (u *Usecase) UpdateSeason(ctx context.Context, input UpdateSeasonInput) error {

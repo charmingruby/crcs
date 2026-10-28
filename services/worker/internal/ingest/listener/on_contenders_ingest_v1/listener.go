@@ -7,18 +7,20 @@ import (
 	"crcs/core/model/enum"
 	"crcs/event/contenders_ingest_v1"
 
-	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
 	"github.com/charmingruby/fsm/fsm"
+
+	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listener struct {
-	taskRepo  *repository.TaskRepository
+	taskRepo  *task.Repository
 	txManager *repository.TransactionManager
 	machine   *fsm.FSM[machineState]
 }
 
 func New(
-	taskRepo *repository.TaskRepository,
+	taskRepo *task.Repository,
 	txManager *repository.TransactionManager,
 ) (*Listener, error) {
 	l := &Listener{

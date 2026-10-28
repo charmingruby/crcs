@@ -10,9 +10,15 @@
   - [x] POST /seasons/:id/match/:mid/result
   - [x] PATCH /seasons/:id/contenders/:cid
 
-- [ ] Codebase improvements (Performance, organization, etc)
+- [x] Codebase improvements (Performance, organization, redundancies, overcomplication, etc)
+- [x] Fixes pipelines
 
-- [ ] Messages should be in pb
+- Organize platform packages
+
+- Messaging
+  - [ ] Change from Kafka to NATS (but don't remove Kafka impls)
+  - [ ] Message vs Events
+  - [ ] Should be named messaging
 
 - [ ] Idempotency, retries, resilience
 

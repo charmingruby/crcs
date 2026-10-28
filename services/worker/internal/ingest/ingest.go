@@ -1,9 +1,11 @@
 package ingest
 
 import (
+	"github.com/jmoiron/sqlx"
+
 	"github.com/charmingruby/crcs/services/worker/internal/ingest/listener/on_contenders_ingest_v1"
 	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
-	"github.com/jmoiron/sqlx"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listeners struct {
@@ -11,7 +13,7 @@ type Listeners struct {
 }
 
 func New(db *sqlx.DB) (*Listeners, error) {
-	taskRepo, err := repository.NewTaskRepository(db)
+	taskRepo, err := task.NewRepository(db)
 	if err != nil {
 		return nil, err
 	}

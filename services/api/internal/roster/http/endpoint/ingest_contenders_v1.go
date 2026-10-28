@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"crcs/event/contenders_ingest_v1"
+
 	"github.com/charmingruby/crcs/services/api/internal/roster/usecase"
 )
 
@@ -57,15 +59,27 @@ func (e *Endpoint) IngestContendersV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contenders := make([]usecase.IngestContendersContender, 0, len(request.Contenders))
+	if err := e.uc.IngestContenders(ctx, usecase.IngestContendersInput{
+		SeasonID:   seasonID,
+		Contenders: contendersFromRequest(request.Contenders),
+	}); err != nil {
+		httpx.HandleErr(w, r, err)
+		return
+	}
 
-	for _, c := range request.Contenders {
-		matches := make([]usecase.IngestContendersCartelMatch, 0, len(c.CartelMatches))
+	httpx.WriteAcceptedResponse(w)
+}
+
+func contendersFromRequest(input []IngestContendersV1Contender) []contenders_ingest_v1.Contender {
+	contenders := make([]contenders_ingest_v1.Contender, 0, len(input))
+
+	for _, c := range input {
+		matches := make([]contenders_ingest_v1.CartelMatch, 0, len(c.CartelMatches))
 
 		for _, m := range c.CartelMatches {
-			matches = append(matches, usecase.IngestContendersCartelMatch{
+			matches = append(matches, contenders_ingest_v1.CartelMatch{
 				EventName:       m.EventName,
-				EventDate:       m.EventDate,
+				EventDate:       m.EventDate.Format(time.RFC3339),
 				Method:          m.Method,
 				Outcome:         m.Outcome,
 				OpponentName:    m.OpponentName,
@@ -77,11 +91,11 @@ func (e *Endpoint) IngestContendersV1(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 
-		contenders = append(contenders, usecase.IngestContendersContender{
+		contenders = append(contenders, contenders_ingest_v1.Contender{
 			FirstName:          c.FirstName,
 			LastName:           c.LastName,
 			Nickname:           c.Nickname,
-			Birthdate:          c.Birthdate,
+			Birthdate:          c.Birthdate.Format(time.RFC3339),
 			PlaceOfBirth:       c.PlaceOfBirth,
 			CurrentWeightClass: c.CurrentWeightClass,
 			Gender:             c.Gender,
@@ -92,13 +106,5 @@ func (e *Endpoint) IngestContendersV1(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := e.uc.IngestContenders(ctx, usecase.IngestContendersInput{
-		SeasonID:   seasonID,
-		Contenders: contenders,
-	}); err != nil {
-		httpx.HandleErr(w, r, err)
-		return
-	}
-
-	httpx.WriteAcceptedResponse(w)
+	return contenders
 }

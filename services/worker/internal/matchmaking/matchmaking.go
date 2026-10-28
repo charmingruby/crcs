@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/listener/on_season_matchmaking_v1"
 	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listeners struct {
@@ -27,7 +28,7 @@ func New(db *sqlx.DB) (*Listeners, error) {
 		return nil, err
 	}
 
-	taskRepo, err := repository.NewTaskRepository(db)
+	taskRepo, err := task.NewRepository(db)
 	if err != nil {
 		return nil, err
 	}

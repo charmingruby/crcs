@@ -12,7 +12,6 @@ func (u *Usecase) GetSeason(
 ) (*model.Season, error) {
 	season, err := u.seasonRepo.FindByID(ctx, id)
 	if err != nil {
-
 		return nil, customerr.Internal("failed to find season by id", err)
 	}
 

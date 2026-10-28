@@ -16,11 +16,12 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 		uc: uc,
 	}
 
-	r.With(auth.WithAuth(tokenMgr)).
-		Post("/v1/seasons/{id}/contenders/ingest", ep.IngestContendersV1)
+	r.Route("/v1/seasons/{id}/contenders", func(r chi.Router) {
+		r.Use(auth.WithAuth(tokenMgr))
 
-	r.With(auth.WithAuth(tokenMgr)).
-		Patch("/v1/seasons/{id}/contenders/{cid}", ep.UpdateContenderStatusV1)
+		r.Post("/ingest", ep.IngestContendersV1)
+		r.Patch("/{cid}", ep.UpdateContenderStatusV1)
+	})
 
 	return ep
 }

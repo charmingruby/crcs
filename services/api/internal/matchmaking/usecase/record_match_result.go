@@ -6,7 +6,6 @@ import (
 	"crcs/core/customerr"
 	"crcs/core/model"
 	"crcs/core/model/enum"
-	"crcs/platform/postgrex"
 
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/repository"
 )
@@ -71,10 +70,6 @@ func (u *Usecase) RecordMatchResult(
 		}
 
 		if err := tx.MatchResultRepository.Create(ctx, result); err != nil {
-			if postgrex.IsIntegrityViolation(err) {
-				return customerr.Conflict("match result already exists")
-			}
-
 			return customerr.Internal("failed to create match result", err)
 		}
 

@@ -12,8 +12,10 @@ import (
 	"crcs/platform/logging"
 	"crcs/platform/postgrex"
 
-	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
 	"github.com/charmingruby/fsm/fsm"
+
+	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 const (
@@ -22,6 +24,11 @@ const (
 	ingestProcessState  fsm.State = "process"
 	ingestFinalizeState fsm.State = "finalize"
 	ingestDoneState     fsm.State = "done"
+
+	// progressFlushInterval bounds how often the task row is rewritten while a
+	// batch is processed. The final counts are always persisted by the finalize
+	// step.
+	progressFlushInterval = 50
 )
 
 type taskMetadata struct {
@@ -40,7 +47,7 @@ type candidate struct {
 }
 
 type machineState struct {
-	taskRepo   *repository.TaskRepository
+	taskRepo   *task.Repository
 	txManager  *repository.TransactionManager
 	message    contenders_ingest_v1.Message
 	task       *model.Task
@@ -58,20 +65,20 @@ func newMachine() *fsm.FSM[machineState] {
 }
 
 func startIngest(ctx context.Context, state *machineState) (fsm.State, error) {
-	task := model.NewTask(model.TaskInput{
+	ingestTask := model.NewTask(model.TaskInput{
 		Type:         enum.IngestContendersTaskType,
 		TotalRecords: len(state.message.Contenders),
 	})
 
-	if err := task.Start(); err != nil {
+	if err := ingestTask.Start(); err != nil {
 		return fsm.EmptyState, customerr.Internal("failed to start task", err)
 	}
 
-	if err := state.taskRepo.Create(ctx, task); err != nil {
+	if err := state.taskRepo.Create(ctx, ingestTask); err != nil {
 		return fsm.EmptyState, customerr.Internal("failed to create task", err)
 	}
 
-	state.task = task
+	state.task = ingestTask
 
 	return ingestBuildState, nil
 }
@@ -113,17 +120,24 @@ func buildIngest(ctx context.Context, state *machineState) (fsm.State, error) {
 }
 
 func processIngest(ctx context.Context, state *machineState) (fsm.State, error) {
-	for _, candidate := range state.candidates {
+	for i, candidate := range state.candidates {
 		err := state.persistCandidate(ctx, candidate)
-		if err == nil {
-			continue
-		}
-
-		if !postgrex.IsIntegrityViolation(err) {
+		switch {
+		case err == nil:
+			if err := state.task.RecordProgress(state.task.ProcessedRecords+1, state.task.FailedRecords); err != nil {
+				return fsm.EmptyState, customerr.Internal("failed to record task progress", err)
+			}
+		case postgrex.IsIntegrityViolation(err):
+			state.recordFailure(ctx, candidate, err)
+		default:
 			return fsm.EmptyState, customerr.Internal("failed to ingest contender", err)
 		}
 
-		state.recordFailure(ctx, candidate, err)
+		if (i+1)%progressFlushInterval == 0 {
+			if err := state.taskRepo.Update(ctx, state.task); err != nil {
+				return fsm.EmptyState, customerr.Internal("failed to flush task progress", err)
+			}
+		}
 	}
 
 	return ingestFinalizeState, nil
@@ -157,18 +171,13 @@ func finalizeIngest(ctx context.Context, state *machineState) (fsm.State, error)
 }
 
 func (r *machineState) persistCandidate(ctx context.Context, candidate candidate) error {
-	var next model.Task
-
-	err := r.txManager.Transact(ctx, func(tx repository.Transaction) error {
+	return r.txManager.Transact(ctx, func(tx repository.Transaction) error {
 		contenderID, err := tx.ContenderRepository.Upsert(ctx, candidate.contender)
 		if err != nil {
 			return err
 		}
 
-		cartel, err := model.NewCartel(contenderID)
-		if err != nil {
-			return err
-		}
+		cartel := model.NewCartel(contenderID)
 
 		for _, match := range candidate.matches {
 			cartel.RegisterMatch(match)
@@ -179,24 +188,8 @@ func (r *machineState) persistCandidate(ctx context.Context, candidate candidate
 			return err
 		}
 
-		if err := tx.CartelMatchRepository.Replace(ctx, cartelID, candidate.matches); err != nil {
-			return err
-		}
-
-		next = *r.task
-		if err := next.RecordProgress(r.task.ProcessedRecords+1, r.task.FailedRecords); err != nil {
-			return err
-		}
-
-		return tx.TaskRepository.Update(ctx, &next)
+		return tx.CartelMatchRepository.Replace(ctx, cartelID, candidate.matches)
 	})
-	if err != nil {
-		return err
-	}
-
-	*r.task = next
-
-	return nil
 }
 
 func (r *machineState) recordFailure(ctx context.Context, candidate candidate, cause error) {
@@ -228,10 +221,6 @@ func (r *machineState) recordFailure(ctx context.Context, candidate candidate, c
 
 	if err := r.task.RecordProgress(r.task.ProcessedRecords, r.task.FailedRecords+1); err != nil {
 		log.Error("ingest: failed to record task progress", "error", err)
-	}
-
-	if err := r.taskRepo.Update(ctx, r.task); err != nil {
-		log.Error("ingest: failed to document contender failure", "error", err)
 	}
 }
 

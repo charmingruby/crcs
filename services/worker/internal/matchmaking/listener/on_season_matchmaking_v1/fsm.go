@@ -9,8 +9,10 @@ import (
 	"crcs/core/model/enum"
 	"crcs/platform/logging"
 
-	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
 	"github.com/charmingruby/fsm/fsm"
+
+	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 const (
@@ -29,7 +31,7 @@ type machineState struct {
 	seasonRepo    *repository.SeasonRepository
 	contenderRepo *repository.ContenderRepository
 	cartelRepo    *repository.CartelRepository
-	taskRepo      *repository.TaskRepository
+	taskRepo      *task.Repository
 	txManager     *repository.TransactionManager
 	seasonID      string
 	season        *model.Season
@@ -54,20 +56,20 @@ func startMatchmaking(ctx context.Context, state *machineState) (fsm.State, erro
 
 	raw := json.RawMessage(metadata)
 
-	task := model.NewTask(model.TaskInput{
+	matchmakingTask := model.NewTask(model.TaskInput{
 		Type:     enum.SeasonMatchmakingTaskType,
 		Metadata: &raw,
 	})
 
-	if err := task.Start(); err != nil {
+	if err := matchmakingTask.Start(); err != nil {
 		return fsm.EmptyState, customerr.Internal("failed to start task", err)
 	}
 
-	if err := state.taskRepo.Create(ctx, task); err != nil {
+	if err := state.taskRepo.Create(ctx, matchmakingTask); err != nil {
 		return fsm.EmptyState, customerr.Internal("failed to create task", err)
 	}
 
-	state.task = task
+	state.task = matchmakingTask
 
 	return matchmakingBuildState, nil
 }

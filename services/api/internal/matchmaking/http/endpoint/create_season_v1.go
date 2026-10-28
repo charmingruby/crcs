@@ -9,9 +9,9 @@ import (
 )
 
 type CreateSeasonV1Request struct {
-	Name    string    `json:"name"      validate:"required,min=1"`
-	Weeks   int       `json:"weeks"     validate:"required,min=1"`
-	StartAt time.Time `json:"start_at"  validate:"required"`
+	StartAt time.Time `json:"start_at" validate:"required"`
+	Name    string    `json:"name"     validate:"required,min=1"`
+	Weeks   int       `json:"weeks"    validate:"required,min=1"`
 }
 
 type CreateSeasonV1Response struct {

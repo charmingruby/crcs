@@ -7,15 +7,17 @@ import (
 	"crcs/core/model/enum"
 	"crcs/event/season_matchmaking_v1"
 
-	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
 	"github.com/charmingruby/fsm/fsm"
+
+	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
+	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listener struct {
 	seasonRepo    *repository.SeasonRepository
 	contenderRepo *repository.ContenderRepository
 	cartelRepo    *repository.CartelRepository
-	taskRepo      *repository.TaskRepository
+	taskRepo      *task.Repository
 	txManager     *repository.TransactionManager
 	machine       *fsm.FSM[machineState]
 }
@@ -24,7 +26,7 @@ func New(
 	seasonRepo *repository.SeasonRepository,
 	contenderRepo *repository.ContenderRepository,
 	cartelRepo *repository.CartelRepository,
-	taskRepo *repository.TaskRepository,
+	taskRepo *task.Repository,
 	txManager *repository.TransactionManager,
 ) (*Listener, error) {
 	l := &Listener{

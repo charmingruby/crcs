@@ -8,18 +8,22 @@ import (
 	"crcs/platform/kafka"
 	"crcs/platform/logging"
 	"crcs/platform/postgrex"
-
 	"errors"
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/charmingruby/crcs/services/worker/internal/ingest"
 	"github.com/charmingruby/crcs/services/worker/internal/matchmaking"
 	"github.com/charmingruby/crcs/services/worker/internal/platform/config"
-	"github.com/jmoiron/sqlx"
 )
+
+const shutdownTimeout = 30 * time.Second
 
 func main() {
 	if err := run(); err != nil {
@@ -54,7 +58,7 @@ func run() error {
 
 	log.Info("postgres: connected")
 
-	ingestListners, err := ingest.New(db)
+	ingestListeners, err := ingest.New(db)
 	if err != nil {
 		log.Error("ingest: module error", "error", err)
 		return err
@@ -66,47 +70,22 @@ func run() error {
 		return err
 	}
 
+	var wg sync.WaitGroup
+
 	shutdownErrCh := make(chan error, 1)
 
-	go func() {
-		log.Info("listener: started consuming messages",
-			"topic", contenders_ingest_v1.Topic,
-		)
-
-		if err := listener.NewKafka[contenders_ingest_v1.Message](kafka.NewReader(
-			cfg.KafkaBrokers,
+	readers := []*kafka.Reader{
+		listen(ctx, log, cfg, &wg, shutdownErrCh,
 			contenders_ingest_v1.Topic,
-			cfg.ServiceName,
-		)).Listen(ctx, ingestListners.OnContendersIngestV1.Handle); err != nil {
-			log.Error("listener: error on consuming messages",
-				"error", err,
-				"topic", contenders_ingest_v1.Topic,
-			)
-
-			shutdownErrCh <- err
-		}
-	}()
-
-	go func() {
-		log.Info("listener: started consuming messages",
-			"topic", season_matchmaking_v1.Topic,
-		)
-
-		if err := listener.NewKafka[season_matchmaking_v1.Message](kafka.NewReader(
-			cfg.KafkaBrokers,
+			ingestListeners.OnContendersIngestV1.Handle,
+		),
+		listen(ctx, log, cfg, &wg, shutdownErrCh,
 			season_matchmaking_v1.Topic,
-			cfg.ServiceName,
-		)).Listen(ctx, matchmakingListeners.OnSeasonMatchmakingV1.Handle); err != nil {
-			log.Error("listener: error on consuming messages",
-				"error", err,
-				"topic", season_matchmaking_v1.Topic,
-			)
+			matchmakingListeners.OnSeasonMatchmakingV1.Handle,
+		),
+	}
 
-			shutdownErrCh <- err
-		}
-	}()
-
-	go shutdown(ctx, log, shutdownErrCh, db)
+	go shutdown(ctx, log, shutdownErrCh, db, readers, &wg)
 
 	if err := <-shutdownErrCh; err != nil {
 		log.Error("shutdown: shutdown error", "error", err)
@@ -117,17 +96,69 @@ func run() error {
 	return nil
 }
 
+func listen[T any](
+	ctx context.Context,
+	log *slog.Logger,
+	cfg *config.Config,
+	wg *sync.WaitGroup,
+	errCh chan<- error,
+	topic string,
+	handle func(context.Context, T) error,
+) *kafka.Reader {
+	reader := kafka.NewReader(cfg.KafkaBrokers, topic, cfg.ServiceName)
+
+	wg.Go(func() {
+		log.Info("listener: started consuming messages",
+			"topic", topic,
+		)
+
+		if err := listener.NewKafka[T](reader).Listen(ctx, handle); err != nil {
+			log.Error("listener: error on consuming messages",
+				"error", err,
+				"topic", topic,
+			)
+
+			errCh <- err
+		}
+	})
+
+	return reader
+}
+
 func shutdown(
 	ctx context.Context,
 	log *slog.Logger,
-	errCh chan error,
+	errCh chan<- error,
 	db *sqlx.DB,
-
+	readers []*kafka.Reader,
+	wg *sync.WaitGroup,
 ) {
 	<-ctx.Done()
 	log.Info("shutdown: signal received, starting graceful shutdown...")
 
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+
 	var err error
+
+	done := make(chan struct{})
+
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+	case <-ctxTimeout.Done():
+		err = errors.Join(err, errors.New("listeners: deadline exceeded, forcing shutdown"))
+	}
+
+	for _, reader := range readers {
+		if closeErr := reader.Close(); closeErr != nil {
+			err = errors.Join(err, closeErr)
+		}
+	}
 
 	if closeErr := db.Close(); closeErr != nil {
 		err = errors.Join(err, closeErr)
