@@ -5,6 +5,7 @@ import (
 	"crcs/platform/logging"
 	"errors"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -18,7 +19,7 @@ func NewServer(port string) (*Server, chi.Router) {
 	addr := ":" + port
 
 	r := chi.NewRouter()
-	r.Use(withValidator(newValidator()), withLogging)
+	r.Use(withValidator(newValidator()), withLogging, withRecovery)
 
 	registerProbes(r)
 
@@ -78,5 +79,27 @@ func withLogging(next http.Handler) http.Handler {
 		defer log.InfoContext(ctx, "request finished")
 
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func withRecovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			recovered := recover()
+			if recovered == nil {
+				return
+			}
+
+			logging.LoggerFromContext(r.Context()).Error("panic recovered",
+				"panic", recovered,
+				"stack", string(debug.Stack()),
+			)
+
+			writeResponse(w, http.StatusInternalServerError, ErrorResponse{
+				Message: "Internal Server Error",
+			})
+		}()
+
+		next.ServeHTTP(w, r)
 	})
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+const maxRequestBodyBytes = 1 << 20
+
 var (
 	ErrInvalidPayload = errors.New("invalid payload")
 	ErrMissingParam   = errors.New("missing param")
@@ -16,6 +18,8 @@ var (
 
 func ParseRequest[T any](w http.ResponseWriter, r *http.Request) (*T, error) {
 	var obj T
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodyBytes)
 
 	if err := json.UnmarshalRead(r.Body, &obj); err != nil {
 		writeResponse(w, http.StatusBadRequest, map[string]string{
