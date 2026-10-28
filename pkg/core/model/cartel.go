@@ -28,11 +28,11 @@ type Cartel struct {
 	ratingSum int
 }
 
-func NewCartel(contenderID string) (*Cartel, error) {
+func NewCartel(contenderID string) *Cartel {
 	return &Cartel{
 		Model:       NewModel(),
 		ContenderID: contenderID,
-	}, nil
+	}
 }
 
 func (c *Cartel) RegisterMatch(match *CartelMatch) {

@@ -40,7 +40,6 @@ func NewTask(input TaskInput) *Task {
 		Model:        NewModel(),
 		Type:         input.Type,
 		Metadata:     input.Metadata,
-		StartedAt:    time.Now(),
 		Status:       enum.PendingTaskStatus,
 		TotalRecords: input.TotalRecords,
 	}
