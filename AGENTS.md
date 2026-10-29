@@ -48,6 +48,7 @@ CRITICAL: Only load the reference below that matches your current task. Do NOT r
 | --- | --- |
 | Implement a domain feature (model → repository → usecase → endpoint) | [docs/internals/coding-patterns.md](docs/internals/coding-patterns.md) + mirror `internal/ticket/` |
 | Add a layer, protocol, or module boundary | [docs/internals/architecture.md](docs/internals/architecture.md) + mirror `internal/ticket/` |
+| Add or change platform infrastructure (config, httpx, o11y, store, broker adapters) | [docs/internals/platform.md](docs/internals/platform.md) |
 | Add or consume an external integration (storage, email, cache, third-party API) | [docs/internals/external-integrations.md](docs/internals/external-integrations.md) |
 | Expose an application boundary — new/handled protocol, or a versioned HTTP/gRPC/queue interface | [docs/internals/versioning.md](docs/internals/versioning.md) |
 | Read another module's data | [docs/internals/cross-module-reads.md](docs/internals/cross-module-reads.md) |
