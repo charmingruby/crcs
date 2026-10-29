@@ -5,7 +5,7 @@ import (
 
 	"crcs/core/model"
 	"crcs/core/model/enum"
-	"crcs/platform/postgrex"
+	"crcs/platform/store/postgrex"
 )
 
 const findCartelsBySeasonIDQuery = "find cartels by season id"

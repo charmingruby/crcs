@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"crcs/core/model"
-	"crcs/platform/postgrex"
+	"crcs/platform/store/postgrex"
 )
 
 const findSeasonByIDQuery = "find season by id"

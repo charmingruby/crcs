@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"crcs/platform/postgrex"
+	"crcs/platform/store/postgrex"
 
 	"github.com/jmoiron/sqlx"
 

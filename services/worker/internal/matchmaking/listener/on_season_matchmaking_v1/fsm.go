@@ -7,7 +7,7 @@ import (
 	"crcs/core/customerr"
 	"crcs/core/model"
 	"crcs/core/model/enum"
-	"crcs/platform/logging"
+	"crcs/platform/o11y/logging"
 
 	"github.com/charmingruby/fsm/fsm"
 

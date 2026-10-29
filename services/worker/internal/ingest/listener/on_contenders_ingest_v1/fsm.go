@@ -9,8 +9,8 @@ import (
 	"crcs/core/model"
 	"crcs/core/model/enum"
 	"crcs/event/contenders_ingest_v1"
-	"crcs/platform/logging"
-	"crcs/platform/postgrex"
+	"crcs/platform/o11y/logging"
+	"crcs/platform/store/postgrex"
 
 	"github.com/charmingruby/fsm/fsm"
 

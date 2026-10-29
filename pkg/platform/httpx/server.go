@@ -2,7 +2,7 @@ package httpx
 
 import (
 	"context"
-	"crcs/platform/logging"
+	"crcs/platform/o11y/logging"
 	"errors"
 	"net/http"
 	"runtime/debug"

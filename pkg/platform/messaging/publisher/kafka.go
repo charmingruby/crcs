@@ -2,8 +2,9 @@ package publisher
 
 import (
 	"context"
-	"crcs/platform/kafka"
-	"crcs/platform/logging"
+
+	"crcs/platform/messaging/broker/kafka"
+	"crcs/platform/o11y/logging"
 	"encoding/json"
 	"fmt"
 )

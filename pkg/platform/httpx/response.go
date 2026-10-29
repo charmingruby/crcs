@@ -2,7 +2,7 @@ package httpx
 
 import (
 	"crcs/core/customerr"
-	"crcs/platform/logging"
+	"crcs/platform/o11y/logging"
 	"encoding/json"
 	"errors"
 	"net/http"

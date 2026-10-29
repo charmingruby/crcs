@@ -1,7 +1,7 @@
 package roster
 
 import (
-	"crcs/platform/broker"
+	"crcs/platform/messaging"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
@@ -17,7 +17,7 @@ import (
 func New(
 	r chi.Router,
 	db *sqlx.DB,
-	pub broker.Publisher,
+	pub messaging.Publisher,
 	seasonReader client.SeasonReader,
 	tokenMgr *auth.TokenManager,
 ) error {

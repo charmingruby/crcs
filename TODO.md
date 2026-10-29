@@ -16,9 +16,8 @@
 - Organize platform packages
 
 - Messaging
-  - [ ] Change from Kafka to NATS (but don't remove Kafka impls)
   - [ ] Message vs Events
-  - [ ] Should be named messaging
+  - [x] Should be named messaging
 
 - [ ] Idempotency, retries, resilience
 

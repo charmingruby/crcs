@@ -1,20 +1,20 @@
 package usecase
 
 import (
-	"crcs/platform/broker"
+	"crcs/platform/messaging"
 
 	"github.com/charmingruby/crcs/services/api/internal/roster/client"
 	"github.com/charmingruby/crcs/services/api/internal/roster/repository"
 )
 
 type Usecase struct {
-	pub          broker.Publisher
+	pub          messaging.Publisher
 	seasonReader client.SeasonReader
 	txManager    *repository.TransactionManager
 }
 
 func New(
-	pub broker.Publisher,
+	pub messaging.Publisher,
 	seasonReader client.SeasonReader,
 	txManager *repository.TransactionManager,
 ) *Usecase {

@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"crcs/platform/broker"
+	"crcs/platform/messaging"
 
 	"github.com/charmingruby/crcs/services/api/internal/matchmaking/repository"
 )
@@ -9,13 +9,13 @@ import (
 type Usecase struct {
 	seasonRepo *repository.SeasonRepository
 	txManager  *repository.TransactionManager
-	pub        broker.Publisher
+	pub        messaging.Publisher
 }
 
 func New(
 	seasonRepo *repository.SeasonRepository,
 	txManager *repository.TransactionManager,
-	pub broker.Publisher,
+	pub messaging.Publisher,
 ) *Usecase {
 	return &Usecase{
 		seasonRepo: seasonRepo,
