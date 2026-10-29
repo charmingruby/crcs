@@ -1,4 +1,4 @@
-package on_season_matchmaking_v1
+package on_season_matchmaking_requested_v1
 
 import (
 	"context"

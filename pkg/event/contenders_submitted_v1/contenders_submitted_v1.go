@@ -1,6 +1,6 @@
-package contenders_ingest_v1
+package contenders_submitted_v1
 
-const Topic = "contenders.ingest.v1"
+const Topic = "contenders.submitted.v1"
 
 type CartelMatch struct {
 	EventName       string

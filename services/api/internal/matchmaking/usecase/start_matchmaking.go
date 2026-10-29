@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"crcs/core/customerr"
-	"crcs/event/season_matchmaking_v1"
+	"crcs/event/season_matchmaking_requested_v1"
 )
 
 func (u *Usecase) StartMatchmaking(ctx context.Context, seasonID string) error {
@@ -19,11 +19,11 @@ func (u *Usecase) StartMatchmaking(ctx context.Context, seasonID string) error {
 
 	if err := u.pub.Publish(
 		ctx,
-		season_matchmaking_v1.Topic,
+		season_matchmaking_requested_v1.Topic,
 		seasonID,
-		season_matchmaking_v1.Message{SeasonID: seasonID},
+		season_matchmaking_requested_v1.Message{SeasonID: seasonID},
 	); err != nil {
-		return customerr.Internal("failed to publish season_matchmaking_v1 message", err)
+		return customerr.Internal("failed to publish season_matchmaking_requested_v1 message", err)
 	}
 
 	return nil

@@ -13,10 +13,10 @@
 - [x] Codebase improvements (Performance, organization, redundancies, overcomplication, etc)
 - [x] Fixes pipelines
 
-- Organize platform packages
+- [x] Organize platform packages
 
 - Messaging
-  - [ ] Message vs Events
+  - [x] Message vs Events
   - [x] Should be named messaging
 
 - [ ] Idempotency, retries, resilience

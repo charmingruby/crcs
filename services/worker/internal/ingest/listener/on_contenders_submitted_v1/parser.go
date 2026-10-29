@@ -1,14 +1,14 @@
-package on_contenders_ingest_v1
+package on_contenders_submitted_v1
 
 import (
 	"fmt"
 	"time"
 
 	"crcs/core/model"
-	"crcs/event/contenders_ingest_v1"
+	"crcs/event/contenders_submitted_v1"
 )
 
-func buildCandidates(message contenders_ingest_v1.Message) ([]candidate, error) {
+func buildCandidates(message contenders_submitted_v1.Message) ([]candidate, error) {
 	candidates := make([]candidate, 0, len(message.Contenders))
 
 	for _, input := range message.Contenders {
@@ -23,7 +23,7 @@ func buildCandidates(message contenders_ingest_v1.Message) ([]candidate, error) 
 	return candidates, nil
 }
 
-func buildCandidate(seasonID string, input contenders_ingest_v1.Contender) (*candidate, error) {
+func buildCandidate(seasonID string, input contenders_submitted_v1.Contender) (*candidate, error) {
 	birthdate, err := time.Parse(time.RFC3339, input.Birthdate)
 	if err != nil {
 		return nil, fmt.Errorf("invalid birthdate: %w", err)
@@ -57,7 +57,7 @@ func buildCandidate(seasonID string, input contenders_ingest_v1.Contender) (*can
 	}, nil
 }
 
-func buildCartelMatches(input contenders_ingest_v1.Contender) ([]*model.CartelMatch, error) {
+func buildCartelMatches(input contenders_submitted_v1.Contender) ([]*model.CartelMatch, error) {
 	matches := make([]*model.CartelMatch, 0, len(input.CartelMatches))
 
 	for _, matchInput := range input.CartelMatches {

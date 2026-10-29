@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"crcs/event/contenders_ingest_v1"
+	"crcs/event/contenders_submitted_v1"
 
 	"github.com/charmingruby/crcs/services/api/internal/roster/usecase"
 )
@@ -70,14 +70,14 @@ func (e *Endpoint) IngestContendersV1(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteAcceptedResponse(w)
 }
 
-func contendersFromRequest(input []IngestContendersV1Contender) []contenders_ingest_v1.Contender {
-	contenders := make([]contenders_ingest_v1.Contender, 0, len(input))
+func contendersFromRequest(input []IngestContendersV1Contender) []contenders_submitted_v1.Contender {
+	contenders := make([]contenders_submitted_v1.Contender, 0, len(input))
 
 	for _, c := range input {
-		matches := make([]contenders_ingest_v1.CartelMatch, 0, len(c.CartelMatches))
+		matches := make([]contenders_submitted_v1.CartelMatch, 0, len(c.CartelMatches))
 
 		for _, m := range c.CartelMatches {
-			matches = append(matches, contenders_ingest_v1.CartelMatch{
+			matches = append(matches, contenders_submitted_v1.CartelMatch{
 				EventName:       m.EventName,
 				EventDate:       m.EventDate.Format(time.RFC3339),
 				Method:          m.Method,
@@ -91,7 +91,7 @@ func contendersFromRequest(input []IngestContendersV1Contender) []contenders_ing
 			})
 		}
 
-		contenders = append(contenders, contenders_ingest_v1.Contender{
+		contenders = append(contenders, contenders_submitted_v1.Contender{
 			FirstName:          c.FirstName,
 			LastName:           c.LastName,
 			Nickname:           c.Nickname,

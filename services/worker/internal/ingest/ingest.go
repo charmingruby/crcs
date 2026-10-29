@@ -3,13 +3,13 @@ package ingest
 import (
 	"github.com/jmoiron/sqlx"
 
-	"github.com/charmingruby/crcs/services/worker/internal/ingest/listener/on_contenders_ingest_v1"
+	"github.com/charmingruby/crcs/services/worker/internal/ingest/listener/on_contenders_submitted_v1"
 	"github.com/charmingruby/crcs/services/worker/internal/ingest/repository"
 	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listeners struct {
-	OnContendersIngestV1 *on_contenders_ingest_v1.Listener
+	OnContendersSubmittedV1 *on_contenders_submitted_v1.Listener
 }
 
 func New(db *sqlx.DB) (*Listeners, error) {
@@ -20,12 +20,12 @@ func New(db *sqlx.DB) (*Listeners, error) {
 
 	txManager := repository.NewTransactionManager(db)
 
-	contendersIngest, err := on_contenders_ingest_v1.New(taskRepo, txManager)
+	contendersSubmitted, err := on_contenders_submitted_v1.New(taskRepo, txManager)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Listeners{
-		OnContendersIngestV1: contendersIngest,
+		OnContendersSubmittedV1: contendersSubmitted,
 	}, nil
 }

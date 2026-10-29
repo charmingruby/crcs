@@ -11,7 +11,7 @@ worker owns the calculations and the persistence.
 
 ## Decision
 
-- One event per request: `seasons.matchmaking.v1` with the `SeasonID`.
+- One event per request: `seasons.matchmaking_requested.v1` with the `SeasonID`.
 - Only contenders with `active` status enter the schedule. Contenders without a
   `gender` are skipped, and a fight only happens inside the same
   `weight_class` + `gender`.
