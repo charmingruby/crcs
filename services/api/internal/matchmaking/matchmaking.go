@@ -24,9 +24,19 @@ func New(
 		return err
 	}
 
+	matchRepo, err := repository.NewMatchRepository(db)
+	if err != nil {
+		return err
+	}
+
+	matchResultRepo, err := repository.NewMatchResultRepository(db)
+	if err != nil {
+		return err
+	}
+
 	txManager := repository.NewTransactionManager(db)
 
-	uc := usecase.New(seasonRepo, txManager, pub)
+	uc := usecase.New(seasonRepo, matchRepo, matchResultRepo, txManager, pub)
 
 	endpoint.New(r, uc, tokenMgr)
 
@@ -39,7 +49,17 @@ func NewSeasonReader(db *sqlx.DB) (*public.SeasonReader, error) {
 		return nil, err
 	}
 
-	uc := usecase.New(seasonRepo, repository.NewTransactionManager(db), nil)
+	matchRepo, err := repository.NewMatchRepository(db)
+	if err != nil {
+		return nil, err
+	}
+
+	matchResultRepo, err := repository.NewMatchResultRepository(db)
+	if err != nil {
+		return nil, err
+	}
+
+	uc := usecase.New(seasonRepo, matchRepo, matchResultRepo, repository.NewTransactionManager(db), nil)
 
 	return public.NewSeasonReader(uc), nil
 }

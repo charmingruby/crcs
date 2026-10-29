@@ -8,19 +8,25 @@ import (
 )
 
 type Usecase struct {
-	pub          messaging.Publisher
-	seasonReader client.SeasonReader
-	txManager    *repository.TransactionManager
+	pub           messaging.Publisher
+	seasonReader  client.SeasonReader
+	contenderRepo *repository.ContenderRepository
+	cartelRepo    *repository.CartelRepository
+	txManager     *repository.TransactionManager
 }
 
 func New(
 	pub messaging.Publisher,
 	seasonReader client.SeasonReader,
+	contenderRepo *repository.ContenderRepository,
+	cartelRepo *repository.CartelRepository,
 	txManager *repository.TransactionManager,
 ) *Usecase {
 	return &Usecase{
-		pub:          pub,
-		seasonReader: seasonReader,
-		txManager:    txManager,
+		pub:           pub,
+		seasonReader:  seasonReader,
+		contenderRepo: contenderRepo,
+		cartelRepo:    cartelRepo,
+		txManager:     txManager,
 	}
 }

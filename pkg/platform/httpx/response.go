@@ -12,6 +12,13 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+type Page[T any] struct {
+	Items  []T `json:"items"`
+	Total  int `json:"total"`
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}
+
 func WriteOKResponse(w http.ResponseWriter, v any) {
 	writeResponse(w, http.StatusOK, v)
 }

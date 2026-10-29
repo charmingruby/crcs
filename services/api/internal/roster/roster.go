@@ -21,9 +21,19 @@ func New(
 	seasonReader client.SeasonReader,
 	tokenMgr *auth.TokenManager,
 ) error {
+	contenderRepo, err := repository.NewContenderRepository(db)
+	if err != nil {
+		return err
+	}
+
+	cartelRepo, err := repository.NewCartelRepository(db)
+	if err != nil {
+		return err
+	}
+
 	txManager := repository.NewTransactionManager(db)
 
-	uc := usecase.New(pub, seasonReader, txManager)
+	uc := usecase.New(pub, seasonReader, contenderRepo, cartelRepo, txManager)
 
 	endpoint.New(r, uc, tokenMgr)
 

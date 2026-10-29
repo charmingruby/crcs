@@ -12,6 +12,8 @@ const (
 	updateSeasonQuery     = "update season"
 	findSeasonByNameQuery = "find season by name"
 	findSeasonByIDQuery   = "find season by id"
+	listSeasonsQuery      = "list seasons"
+	countSeasonsQuery     = "count seasons"
 )
 
 var seasonQueries = map[string]string{
@@ -40,6 +42,22 @@ var seasonQueries = map[string]string{
 		WHERE
 			id=$1 AND
 			deleted_at IS NULL`,
+	listSeasonsQuery: `
+		SELECT * FROM seasons
+		WHERE
+			($1 = '' OR status = $1) AND
+			deleted_at IS NULL
+		ORDER BY start_at DESC, id
+		LIMIT $2 OFFSET $3`,
+	countSeasonsQuery: `
+		SELECT COUNT(*) AS total FROM seasons
+		WHERE
+			($1 = '' OR status = $1) AND
+			deleted_at IS NULL`,
+}
+
+type countRow struct {
+	Total int `db:"total"`
 }
 
 type SeasonRepository struct {
@@ -83,4 +101,21 @@ func (r *SeasonRepository) FindByName(ctx context.Context, name string) (*model.
 
 func (r *SeasonRepository) FindByID(ctx context.Context, id string) (*model.Season, error) {
 	return postgrex.One[model.Season](ctx, r.stmts, findSeasonByIDQuery, id)
+}
+
+func (r *SeasonRepository) List(ctx context.Context, status string, limit, offset int) ([]*model.Season, error) {
+	return postgrex.Many[*model.Season](ctx, r.stmts, listSeasonsQuery, status, limit, offset)
+}
+
+func (r *SeasonRepository) Count(ctx context.Context, status string) (int, error) {
+	row, err := postgrex.One[countRow](ctx, r.stmts, countSeasonsQuery, status)
+	if err != nil {
+		return 0, err
+	}
+
+	if row == nil {
+		return 0, nil
+	}
+
+	return row.Total, nil
 }

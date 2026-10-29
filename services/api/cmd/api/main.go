@@ -23,6 +23,7 @@ import (
 	"github.com/charmingruby/crcs/services/api/internal/platform/config"
 
 	"github.com/charmingruby/crcs/services/api/internal/roster"
+	"github.com/charmingruby/crcs/services/api/internal/task"
 )
 
 const shutdownTimeout = 30 * time.Second
@@ -88,6 +89,11 @@ func run() error {
 
 	if err := roster.New(router, db, pub, seasonReader, tokenMgr); err != nil {
 		log.Error("roster: module error", "error", err)
+		return err
+	}
+
+	if err := task.New(router, db, tokenMgr); err != nil {
+		log.Error("task: module error", "error", err)
 		return err
 	}
 

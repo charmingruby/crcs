@@ -14,3 +14,5 @@ CREATE TABLE tasks (
     updated_at TIMESTAMPTZ DEFAULT NULL,
     deleted_at TIMESTAMPTZ DEFAULT NULL
 );
+
+CREATE INDEX idx_tasks_metadata_season_id ON tasks ((metadata->>'season_id'));

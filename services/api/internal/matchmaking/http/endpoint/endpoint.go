@@ -19,6 +19,10 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 	r.Route("/v1/seasons", func(r chi.Router) {
 		r.Use(auth.WithAuth(tokenMgr))
 
+		r.Get("/", ep.ListSeasonsV1)
+		r.Get("/{id}", ep.GetSeasonV1)
+		r.Get("/{id}/matches", ep.ListSeasonMatchesV1)
+		r.Get("/{id}/matches/{mid}", ep.GetSeasonMatchV1)
 		r.Post("/", ep.CreateSeasonV1)
 		r.Patch("/{id}", ep.UpdateSeasonV1)
 		r.Post("/{id}/matchmaking", ep.StartMatchmakingV1)

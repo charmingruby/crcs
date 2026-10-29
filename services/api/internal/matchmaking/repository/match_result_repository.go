@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	createMatchResultQuery        = "create match result"
-	findMatchResultByMatchIDQuery = "find match result by match id"
+	createMatchResultQuery          = "create match result"
+	findMatchResultByMatchIDQuery   = "find match result by match id"
+	findMatchResultsBySeasonIDQuery = "find match results by season id"
 )
 
 var matchResultQueries = map[string]string{
@@ -22,6 +23,13 @@ var matchResultQueries = map[string]string{
 		WHERE
 			match_id=$1 AND
 			deleted_at IS NULL`,
+	findMatchResultsBySeasonIDQuery: `
+		SELECT r.* FROM season_match_results r
+		INNER JOIN season_matches m ON m.id = r.match_id
+		WHERE
+			m.season_id=$1 AND
+			m.deleted_at IS NULL AND
+			r.deleted_at IS NULL`,
 }
 
 type MatchResultRepository struct {
@@ -53,4 +61,8 @@ func (r *MatchResultRepository) Create(ctx context.Context, result *model.MatchR
 
 func (r *MatchResultRepository) FindByMatchID(ctx context.Context, matchID string) (*model.MatchResult, error) {
 	return postgrex.One[model.MatchResult](ctx, r.stmts, findMatchResultByMatchIDQuery, matchID)
+}
+
+func (r *MatchResultRepository) FindBySeasonID(ctx context.Context, seasonID string) ([]*model.MatchResult, error) {
+	return postgrex.Many[*model.MatchResult](ctx, r.stmts, findMatchResultsBySeasonIDQuery, seasonID)
 }

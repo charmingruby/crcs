@@ -19,6 +19,8 @@ func New(r chi.Router, uc *usecase.Usecase, tokenMgr *auth.TokenManager) *Endpoi
 	r.Route("/v1/seasons/{id}/contenders", func(r chi.Router) {
 		r.Use(auth.WithAuth(tokenMgr))
 
+		r.Get("/", ep.ListContendersV1)
+		r.Get("/{cid}", ep.GetContenderV1)
 		r.Post("/ingest", ep.IngestContendersV1)
 		r.Patch("/{cid}", ep.UpdateContenderStatusV1)
 	})
