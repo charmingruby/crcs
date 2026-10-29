@@ -13,6 +13,7 @@ _(No docs yet — add product and architecture decision records here.)_
 How to work in this codebase. Patterns, guidelines, integration rules, terminology.
 
 - [Architecture overview](./internals/architecture.md) — runtime flow, request lifecycle, domain structure
+- [Platform](./internals/platform.md) — config, httpx, o11y, store, and broker adapters; zero domain awareness
 - [Glossary](./internals/glossary.md) — domain terms with source file links
 - [Coding patterns](./internals/coding-patterns.md) — complete implementation reference per layer
 - [Cross-module reads](./internals/cross-module-reads.md) — the client-port pattern for inter-domain data

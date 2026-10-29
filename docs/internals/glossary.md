@@ -25,7 +25,7 @@ One business action; orchestrates model + repository + client ports. Rule: [codi
 
 #### Repository
 
-Concrete golden source, no interface. Rule: [coding-patterns.md](./coding-patterns.md#2-repository-golden-source-concrete)
+Concrete golden source over prepared statements and the `postgrex` helpers; no interface. Rule: [coding-patterns.md](./coding-patterns.md#2-repository-golden-source-concrete)
 
 #### Client (outbound port)
 
@@ -91,7 +91,15 @@ Domain types, typed errors, ports + adapters used by 2+ domains. See directory: 
 
 #### platform
 
-App infrastructure with zero domain awareness: owns cross-cutting capabilities the app needs to run, e.g. config, observability (`logging`, metrics, tracing), transport (`httpx`), provider connections (`postgrex`, `awsx`, `kafka`). See directory: [internal/platform/](../../internal/platform/)
+App infrastructure with zero domain awareness: `config`, `httpx`, `o11y`, `store`, and `messaging`. Only messaging is port + adapter. Rule: [platform.md](./platform.md)
+
+#### store
+
+System-of-record toolkit under `internal/platform/store/<provider>/`; no port, and the repository stays concrete. Rule: [platform.md](./platform.md#store)
+
+#### config
+
+Typed environment configuration loaded at boot from `internal/platform/config/`. Rule: [platform.md](./platform.md#config)
 
 #### pkg (reserved)
 

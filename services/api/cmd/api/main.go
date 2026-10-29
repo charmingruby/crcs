@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"crcs/platform/broker/publisher"
 	"crcs/platform/httpx"
-	"crcs/platform/kafka"
-	"crcs/platform/logging"
-	"crcs/platform/postgrex"
+	"crcs/platform/messaging/broker/kafka"
+	"crcs/platform/messaging/publisher"
+
+	"crcs/platform/o11y/logging"
+	"crcs/platform/store/postgrex"
 	"errors"
 	"log/slog"
 	"os"

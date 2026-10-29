@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"crcs/event/contenders_ingest_v1"
-	"crcs/event/season_matchmaking_v1"
-	"crcs/platform/broker/listener"
-	"crcs/platform/kafka"
-	"crcs/platform/logging"
-	"crcs/platform/postgrex"
+	"crcs/event/contenders_submitted_v1"
+	"crcs/event/season_matchmaking_requested_v1"
+
+	"crcs/platform/messaging/broker/kafka"
+	"crcs/platform/messaging/listener"
+	"crcs/platform/o11y/logging"
+	"crcs/platform/store/postgrex"
 	"errors"
 	"log/slog"
 	"os"
@@ -76,12 +77,12 @@ func run() error {
 
 	readers := []*kafka.Reader{
 		listen(ctx, log, cfg, &wg, shutdownErrCh,
-			contenders_ingest_v1.Topic,
-			ingestListeners.OnContendersIngestV1.Handle,
+			contenders_submitted_v1.Topic,
+			ingestListeners.OnContendersSubmittedV1.Handle,
 		),
 		listen(ctx, log, cfg, &wg, shutdownErrCh,
-			season_matchmaking_v1.Topic,
-			matchmakingListeners.OnSeasonMatchmakingV1.Handle,
+			season_matchmaking_requested_v1.Topic,
+			matchmakingListeners.OnSeasonMatchmakingRequestedV1.Handle,
 		),
 	}
 

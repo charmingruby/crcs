@@ -1,7 +1,7 @@
 package matchmaking
 
 import (
-	"crcs/platform/broker"
+	"crcs/platform/messaging"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
@@ -16,7 +16,7 @@ import (
 func New(
 	r chi.Router,
 	db *sqlx.DB,
-	pub broker.Publisher,
+	pub messaging.Publisher,
 	tokenMgr *auth.TokenManager,
 ) error {
 	seasonRepo, err := repository.NewSeasonRepository(db)

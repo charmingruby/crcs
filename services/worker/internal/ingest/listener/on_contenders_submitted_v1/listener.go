@@ -1,11 +1,11 @@
-package on_contenders_ingest_v1
+package on_contenders_submitted_v1
 
 import (
 	"context"
 	"fmt"
 
 	"crcs/core/model/enum"
-	"crcs/event/contenders_ingest_v1"
+	"crcs/event/contenders_submitted_v1"
 
 	"github.com/charmingruby/fsm/fsm"
 
@@ -36,7 +36,7 @@ func New(
 	return l, nil
 }
 
-func (l *Listener) Handle(ctx context.Context, message contenders_ingest_v1.Message) error {
+func (l *Listener) Handle(ctx context.Context, message contenders_submitted_v1.Message) error {
 	run := &machineState{
 		taskRepo:  l.taskRepo,
 		txManager: l.txManager,

@@ -13,12 +13,11 @@
 - [x] Codebase improvements (Performance, organization, redundancies, overcomplication, etc)
 - [x] Fixes pipelines
 
-- Organize platform packages
+- [x] Organize platform packages
 
 - Messaging
-  - [ ] Change from Kafka to NATS (but don't remove Kafka impls)
-  - [ ] Message vs Events
-  - [ ] Should be named messaging
+  - [x] Message vs Events
+  - [x] Should be named messaging
 
 - [ ] Idempotency, retries, resilience
 

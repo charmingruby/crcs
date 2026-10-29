@@ -1,4 +1,4 @@
-package on_season_matchmaking_v1
+package on_season_matchmaking_requested_v1
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"crcs/core/customerr"
 	"crcs/core/model"
 	"crcs/core/model/enum"
-	"crcs/platform/logging"
+	"crcs/platform/o11y/logging"
 
 	"github.com/charmingruby/fsm/fsm"
 

@@ -3,13 +3,13 @@ package matchmaking
 import (
 	"github.com/jmoiron/sqlx"
 
-	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/listener/on_season_matchmaking_v1"
+	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/listener/on_season_matchmaking_requested_v1"
 	"github.com/charmingruby/crcs/services/worker/internal/matchmaking/repository"
 	"github.com/charmingruby/crcs/services/worker/internal/shared/task"
 )
 
 type Listeners struct {
-	OnSeasonMatchmakingV1 *on_season_matchmaking_v1.Listener
+	OnSeasonMatchmakingRequestedV1 *on_season_matchmaking_requested_v1.Listener
 }
 
 func New(db *sqlx.DB) (*Listeners, error) {
@@ -35,7 +35,7 @@ func New(db *sqlx.DB) (*Listeners, error) {
 
 	txManager := repository.NewTransactionManager(db)
 
-	listener, err := on_season_matchmaking_v1.New(
+	listener, err := on_season_matchmaking_requested_v1.New(
 		seasonRepo,
 		contenderRepo,
 		cartelRepo,
@@ -47,6 +47,6 @@ func New(db *sqlx.DB) (*Listeners, error) {
 	}
 
 	return &Listeners{
-		OnSeasonMatchmakingV1: listener,
+		OnSeasonMatchmakingRequestedV1: listener,
 	}, nil
 }
