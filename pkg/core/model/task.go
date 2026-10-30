@@ -16,22 +16,22 @@ var (
 )
 
 type Task struct {
-	Type             enum.TaskType    `json:"type"              db:"type"`
-	Metadata         *json.RawMessage `json:"metadata"          db:"metadata"`
-	Status           enum.TaskStatus  `json:"status"            db:"status"`
-	TotalRecords     int              `json:"total_records"     db:"total_records"`
-	ProcessedRecords int              `json:"processed_records" db:"processed_records"`
-	FailedRecords    int              `json:"failed_records"    db:"failed_records"`
-	AttemptCount     int              `json:"attempt_count"     db:"attempt_count"`
-	ErrorMessage     *string          `json:"error_message"     db:"error_message"`
 	StartedAt        time.Time        `json:"started_at"        db:"started_at"`
+	Metadata         *json.RawMessage `json:"metadata"          db:"metadata"`
+	ErrorMessage     *string          `json:"error_message"     db:"error_message"`
 	FinishedAt       *time.Time       `json:"finished_at"       db:"finished_at"`
-	Model            `                   db:",inline"`
+	Model            ` db:",inline"`
+	Type             enum.TaskType   `json:"type"              db:"type"`
+	Status           enum.TaskStatus `json:"status"            db:"status"`
+	TotalRecords     int             `json:"total_records"     db:"total_records"`
+	ProcessedRecords int             `json:"processed_records" db:"processed_records"`
+	FailedRecords    int             `json:"failed_records"    db:"failed_records"`
+	AttemptCount     int             `json:"attempt_count"     db:"attempt_count"`
 }
 
 type TaskInput struct {
-	Type         enum.TaskType
 	Metadata     *json.RawMessage
+	Type         enum.TaskType
 	TotalRecords int
 }
 
