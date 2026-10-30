@@ -11,24 +11,24 @@ import (
 )
 
 type CartelV1 struct {
+	CreatedAt            time.Time  `json:"created_at"`
+	UpdatedAt            *time.Time `json:"updated_at"`
+	LastFightDate        *time.Time `json:"last_fight_date"`
+	AvgPerformanceRating *int       `json:"avg_performance_rating"`
 	ContenderID          string     `json:"contender_id"`
-	Wins                 int        `json:"wins"`
-	Losses               int        `json:"losses"`
-	Draws                int        `json:"draws"`
-	NoContests           int        `json:"no_contests"`
-	WinsByKO             int        `json:"wins_by_ko"`
+	WinsByDec            int        `json:"wins_by_dec"`
 	WinsByTKO            int        `json:"wins_by_tko"`
 	WinsBySub            int        `json:"wins_by_sub"`
-	WinsByDec            int        `json:"wins_by_dec"`
+	WinsByKO             int        `json:"wins_by_ko"`
 	LossesByKO           int        `json:"losses_by_ko"`
 	LossesByTKO          int        `json:"losses_by_tko"`
 	LossesBySub          int        `json:"losses_by_sub"`
 	LossesByDec          int        `json:"losses_by_dec"`
-	AvgPerformanceRating *int       `json:"avg_performance_rating"`
-	LastFightDate        *time.Time `json:"last_fight_date"`
+	NoContests           int        `json:"no_contests"`
+	Draws                int        `json:"draws"`
 	TotalFights          int        `json:"total_fights"`
-	CreatedAt            time.Time  `json:"created_at"`
-	UpdatedAt            *time.Time `json:"updated_at"`
+	Losses               int        `json:"losses"`
+	Wins                 int        `json:"wins"`
 }
 
 type GetContenderV1Response struct {

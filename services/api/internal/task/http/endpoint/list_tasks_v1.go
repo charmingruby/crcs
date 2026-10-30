@@ -12,19 +12,19 @@ import (
 )
 
 type TaskV1 struct {
-	ID               string           `json:"id"`
-	Type             string           `json:"type"`
-	Status           string           `json:"status"`
+	StartedAt        time.Time        `json:"started_at"`
+	CreatedAt        time.Time        `json:"created_at"`
 	Metadata         *json.RawMessage `json:"metadata"`
+	ErrorMessage     *string          `json:"error_message"`
+	FinishedAt       *time.Time       `json:"finished_at"`
+	UpdatedAt        *time.Time       `json:"updated_at"`
+	ID               string           `json:"id"`
+	Status           string           `json:"status"`
+	Type             string           `json:"type"`
 	TotalRecords     int              `json:"total_records"`
 	ProcessedRecords int              `json:"processed_records"`
 	FailedRecords    int              `json:"failed_records"`
 	AttemptCount     int              `json:"attempt_count"`
-	ErrorMessage     *string          `json:"error_message"`
-	StartedAt        time.Time        `json:"started_at"`
-	FinishedAt       *time.Time       `json:"finished_at"`
-	CreatedAt        time.Time        `json:"created_at"`
-	UpdatedAt        *time.Time       `json:"updated_at"`
 }
 
 func (e *Endpoint) ListTasksV1(w http.ResponseWriter, r *http.Request) {

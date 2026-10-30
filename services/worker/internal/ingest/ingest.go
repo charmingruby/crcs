@@ -5,6 +5,7 @@ import (
 
 	"crcs/event/contenders_submitted_v1"
 	"crcs/platform/store/postgrex"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/charmingruby/crcs/services/worker/internal/ingest/listener/on_contenders_submitted_v1"

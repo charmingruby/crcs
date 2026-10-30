@@ -27,7 +27,12 @@ func (u *Usecase) PublishNext(ctx context.Context) (bool, error) {
 			return nil
 		}
 
-		if err := u.pub.Publish(messaging.WithMessageID(ctx, event.ID), event.Topic, event.Key, event.Payload); err != nil {
+		if err := u.pub.Publish(
+			messaging.WithMessageID(ctx, event.ID),
+			event.Topic,
+			event.Key,
+			event.Payload,
+		); err != nil {
 			return customerr.Internal("failed to publish event", err)
 		}
 

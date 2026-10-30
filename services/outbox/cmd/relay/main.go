@@ -39,10 +39,18 @@ func run() error {
 		log.Error("postgres: connection failed", "error", err)
 		return err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Error("postgres: closing connection failed", "error", err)
+		}
+	}()
 
 	writer := kafka.NewWriter(cfg.KafkaBrokers)
-	defer writer.Close()
+	defer func() {
+		if err := writer.Close(); err != nil {
+			log.Error("kafka: closing writer failed", "error", err)
+		}
+	}()
 
 	log.Info("outbox: relay started")
 

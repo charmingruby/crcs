@@ -12,13 +12,13 @@ import (
 )
 
 type SeasonV1 struct {
+	StartAt   time.Time  `json:"start_at"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 	ID        string     `json:"id"`
 	Name      string     `json:"name"`
 	Status    string     `json:"status"`
 	Weeks     int        `json:"weeks"`
-	StartAt   time.Time  `json:"start_at"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
 }
 
 func (e *Endpoint) ListSeasonsV1(w http.ResponseWriter, r *http.Request) {
