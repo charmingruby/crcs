@@ -8,11 +8,18 @@ import (
 )
 
 const (
-	deleteSeasonMatchesQuery = "delete season matches without result"
-	createSeasonMatchQuery   = "create season match"
+	deleteSeasonMatchesQuery    = "delete season matches without result"
+	createSeasonMatchQuery      = "create season match"
+	findMatchesWithResultsQuery = "find matches with results"
 )
 
 var matchQueries = map[string]string{
+	findMatchesWithResultsQuery: `
+		SELECT sm.* FROM season_matches sm
+		WHERE sm.season_id=$1 AND sm.deleted_at IS NULL
+		AND EXISTS (SELECT 1 FROM season_match_results r
+			WHERE r.match_id=sm.id AND r.deleted_at IS NULL)
+		ORDER BY sm.week, sm.position`,
 	deleteSeasonMatchesQuery: `
 		DELETE FROM season_matches sm
 		WHERE
@@ -66,4 +73,8 @@ func (r *MatchRepository) ReplaceBySeason(
 	}
 
 	return nil
+}
+
+func (r *MatchRepository) FindWithResults(ctx context.Context, seasonID string) ([]*model.Match, error) {
+	return postgrex.Many[*model.Match](ctx, r.stmts, findMatchesWithResultsQuery, seasonID)
 }

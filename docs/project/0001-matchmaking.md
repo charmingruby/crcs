@@ -6,7 +6,7 @@
 ## Context
 
 `POST /v1/seasons/{id}/matchmaking` must turn a season roster into a fight
-schedule. The API checks that the season exists and publishes an event; the
+schedule. The API checks that the season exists and enqueues an event; the
 worker owns the calculations and the persistence.
 
 ## Decision
@@ -35,9 +35,14 @@ worker owns the calculations and the persistence.
   `experience = min(totalFights, 10) * 10`. A missing cartel scores as a
   newcomer (`record = 0`, `quality = 50`), and a missing rating defaults
   `quality` to 50. Ties break on total fights, last fight date, then ID.
-- Regeneration deletes the season matches that have no result and recreates the
-  schedule in the same transaction, so redelivery before any result reproduces
-  the schedule.
+- Regeneration preserves matches with results, including their IDs, weeks, and
+  positions. Their contenders are excluded from pairing, and their occupied
+  slots count toward the five-fight weekly limit. Only matches without results
+  are replaced, in the same transaction.
+- Matchmaking locks the season until commit. Result recording takes the same
+  lock, so it cannot race with schedule replacement.
+- Redelivery of an event is ignored after its first committed processing. A new
+  matchmaking request is a new event and intentionally regenerates the schedule.
 
 ## Consequences
 
@@ -46,8 +51,7 @@ worker owns the calculations and the persistence.
   number of weeks leaves empty cards.
 - Changing the scoring weights or the card rule changes existing schedules on
   the next matchmaking run.
-- Match IDs change on every run, even when the schedule itself is identical.
-- Results already recorded are never deleted, but regeneration is only
-  idempotent while no result exists: the result-bearing match survives and the
-  recalculated schedule inserts a duplicate fight for that contender. Tracked
-  in `TODO.md`.
+- IDs of matches without results change on each new matchmaking request, even
+  when the schedule itself is identical. Redelivery does not change IDs.
+- Results already recorded are never deleted. Regeneration cannot reorder
+  preserved matches to optimize the appeal of their cards.

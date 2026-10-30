@@ -17,24 +17,24 @@ var (
 )
 
 type Match struct {
-	SeasonID            string           `json:"season_id"              db:"season_id"`
-	Week                int              `json:"week"                   db:"week"`
-	Position            int              `json:"position"               db:"position"`
-	FavoriteContenderID string           `json:"favorite_contender_id"  db:"favorite_contender_id"`
-	UnderdogContenderID string           `json:"underdog_contender_id"  db:"underdog_contender_id"`
-	WeightClass         enum.WeightClass `json:"weight_class"           db:"weight_class"`
-	Gender              *enum.Gender     `json:"gender"                 db:"gender"`
-	Model               `             db:",inline"`
+	Gender              *enum.Gender `json:"gender"                db:"gender"`
+	Model               ` db:",inline"`
+	SeasonID            string           `json:"season_id"             db:"season_id"`
+	FavoriteContenderID string           `json:"favorite_contender_id" db:"favorite_contender_id"`
+	UnderdogContenderID string           `json:"underdog_contender_id" db:"underdog_contender_id"`
+	WeightClass         enum.WeightClass `json:"weight_class"          db:"weight_class"`
+	Week                int              `json:"week"                  db:"week"`
+	Position            int              `json:"position"              db:"position"`
 }
 
 type MatchInput struct {
 	SeasonID            string
-	Week                int
-	Position            int
 	FavoriteContenderID string
 	UnderdogContenderID string
 	WeightClass         enum.WeightClass
 	Gender              enum.Gender
+	Week                int
+	Position            int
 }
 
 func NewMatch(input MatchInput) (*Match, error) {

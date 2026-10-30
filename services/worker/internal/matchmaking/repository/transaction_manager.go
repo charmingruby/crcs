@@ -16,10 +16,10 @@ type Transaction struct {
 }
 
 type TransactionManager struct {
-	db *sqlx.DB
+	db postgrex.Querier
 }
 
-func NewTransactionManager(db *sqlx.DB) *TransactionManager {
+func NewTransactionManager(db postgrex.Querier) *TransactionManager {
 	return &TransactionManager{db: db}
 }
 

@@ -2,6 +2,7 @@ package listener
 
 import (
 	"context"
+	"crcs/platform/messaging"
 	"crcs/platform/messaging/broker/kafka"
 	"crcs/platform/o11y/logging"
 	"encoding/json"
@@ -39,7 +40,7 @@ func (k *Kafka[T]) Listen(
 			return fmt.Errorf("listener: unmarshal event: %w", err)
 		}
 
-		if err := handler(ctx, event); err != nil {
+		if err := handler(messaging.WithMessageID(ctx, m.ID), event); err != nil {
 			log.Error("unable to handle message",
 				"error", err,
 				"topic", m.Topic,

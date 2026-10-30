@@ -14,9 +14,11 @@ const (
 	findSeasonByIDQuery   = "find season by id"
 	listSeasonsQuery      = "list seasons"
 	countSeasonsQuery     = "count seasons"
+	lockSeasonByIDQuery   = "lock season by id"
 )
 
 var seasonQueries = map[string]string{
+	lockSeasonByIDQuery: `SELECT * FROM seasons WHERE id=$1 AND deleted_at IS NULL FOR UPDATE`,
 	createSeasonQuery: `
 		INSERT INTO seasons
 		(id, name, status, weeks, start_at, created_at)
@@ -101,6 +103,10 @@ func (r *SeasonRepository) FindByName(ctx context.Context, name string) (*model.
 
 func (r *SeasonRepository) FindByID(ctx context.Context, id string) (*model.Season, error) {
 	return postgrex.One[model.Season](ctx, r.stmts, findSeasonByIDQuery, id)
+}
+
+func (r *SeasonRepository) LockByID(ctx context.Context, id string) (*model.Season, error) {
+	return postgrex.One[model.Season](ctx, r.stmts, lockSeasonByIDQuery, id)
 }
 
 func (r *SeasonRepository) List(ctx context.Context, status string, limit, offset int) ([]*model.Season, error) {

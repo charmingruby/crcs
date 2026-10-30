@@ -11,21 +11,21 @@ import (
 )
 
 type ContenderV1 struct {
-	ID                 string     `json:"id"`
-	FirstName          string     `json:"first_name"`
-	LastName           string     `json:"last_name"`
-	Nickname           *string    `json:"nickname"`
+	CreatedAt          time.Time  `json:"created_at"`
 	Birthdate          time.Time  `json:"birthdate"`
-	PlaceOfBirth       string     `json:"place_of_birth"`
+	Gender             *string    `json:"gender"`
+	UpdatedAt          *time.Time `json:"updated_at"`
+	Nickname           *string    `json:"nickname"`
 	CurrentWeightClass string     `json:"current_weight_class"`
+	ID                 string     `json:"id"`
+	PlaceOfBirth       string     `json:"place_of_birth"`
+	SeasonID           string     `json:"season_id"`
+	Status             string     `json:"status"`
+	LastName           string     `json:"last_name"`
+	FirstName          string     `json:"first_name"`
 	Reach              int        `json:"reach"`
 	Height             int        `json:"height"`
 	Weight             int        `json:"weight"`
-	Gender             *string    `json:"gender"`
-	SeasonID           string     `json:"season_id"`
-	Status             string     `json:"status"`
-	CreatedAt          time.Time  `json:"created_at"`
-	UpdatedAt          *time.Time `json:"updated_at"`
 }
 
 func (e *Endpoint) ListContendersV1(w http.ResponseWriter, r *http.Request) {

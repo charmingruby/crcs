@@ -14,7 +14,8 @@ var seasonQueries = map[string]string{
 		SELECT * FROM seasons
 		WHERE
 			id=$1 AND
-			deleted_at IS NULL`,
+			deleted_at IS NULL
+		FOR UPDATE`,
 }
 
 type SeasonRepository struct {

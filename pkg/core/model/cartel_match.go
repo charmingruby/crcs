@@ -18,29 +18,29 @@ var (
 )
 
 type CartelMatch struct {
-	CartelID        string            `json:"cartel_id"         db:"cartel_id"`
-	EventName       string            `json:"event_name"        db:"event_name"`
-	EventDate       time.Time         `json:"event_date"        db:"event_date"`
-	EventRating     int               `json:"event_rating"      db:"event_rating"`
-	Method          enum.FightMethod  `json:"method"            db:"method"`
-	Outcome         enum.FightOutcome `json:"outcome"           db:"outcome"`
-	OpponentName    string            `json:"opponent_name"     db:"opponent_name"`
-	WeightClass     enum.WeightClass  `json:"weight_class"      db:"weight_class"`
-	FightDuration   string            `json:"fight_duration"    db:"fight_duration"`
-	ScheduledRounds int               `json:"scheduled_rounds"  db:"scheduled_rounds"`
-	ActualRounds    int               `json:"actual_rounds"     db:"actual_rounds"`
-	Model           `                    db:",inline"`
+	EventDate       time.Time `json:"event_date"       db:"event_date"`
+	Model           ` db:",inline"`
+	CartelID        string            `json:"cartel_id"        db:"cartel_id"`
+	EventName       string            `json:"event_name"       db:"event_name"`
+	Method          enum.FightMethod  `json:"method"           db:"method"`
+	Outcome         enum.FightOutcome `json:"outcome"          db:"outcome"`
+	OpponentName    string            `json:"opponent_name"    db:"opponent_name"`
+	WeightClass     enum.WeightClass  `json:"weight_class"     db:"weight_class"`
+	FightDuration   string            `json:"fight_duration"   db:"fight_duration"`
+	EventRating     int               `json:"event_rating"     db:"event_rating"`
+	ScheduledRounds int               `json:"scheduled_rounds" db:"scheduled_rounds"`
+	ActualRounds    int               `json:"actual_rounds"    db:"actual_rounds"`
 }
 
 type CartelMatchInput struct {
-	EventName       string
 	EventDate       time.Time
-	EventRating     int
+	EventName       string
 	Method          string
 	Outcome         string
 	OpponentName    string
 	WeightClass     string
 	FightDuration   string
+	EventRating     int
 	ScheduledRounds int
 	ActualRounds    int
 }

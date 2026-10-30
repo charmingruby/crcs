@@ -21,6 +21,7 @@ jobs:
           - pkg/platform
           - services/api
           - services/worker
+          - services/outbox
 
     steps:
       - name: Checkout

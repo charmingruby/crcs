@@ -17,14 +17,14 @@ var (
 )
 
 type MatchResult struct {
+	WinnerID        *string `json:"winner_id"        db:"winner_id"`
+	Model           ` db:",inline"`
 	MatchID         string            `json:"match_id"         db:"match_id"`
-	WinnerID        *string           `json:"winner_id"        db:"winner_id"`
 	Outcome         enum.FightOutcome `json:"outcome"          db:"outcome"`
 	Method          enum.FightMethod  `json:"method"           db:"method"`
 	FightDuration   int               `json:"fight_duration"   db:"fight_duration"`
 	ScheduledRounds int               `json:"scheduled_rounds" db:"scheduled_rounds"`
 	ActualRounds    int               `json:"actual_rounds"    db:"actual_rounds"`
-	Model           `             db:",inline"`
 }
 
 type MatchResultInput struct {

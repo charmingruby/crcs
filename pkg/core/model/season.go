@@ -16,17 +16,17 @@ var (
 )
 
 type Season struct {
+	StartAt time.Time `json:"start_at" db:"start_at"`
+	Model   ` db:",inline"`
 	Name    string            `json:"name"     db:"name"`
 	Status  enum.SeasonStatus `json:"status"   db:"status"`
 	Weeks   int               `json:"weeks"    db:"weeks"`
-	StartAt time.Time         `json:"start_at" db:"start_at"`
-	Model   `           db:",inline"`
 }
 
 type SeasonInput struct {
+	StartAt time.Time
 	Name    string
 	Weeks   int
-	StartAt time.Time
 }
 
 type SeasonUpdateInput struct {

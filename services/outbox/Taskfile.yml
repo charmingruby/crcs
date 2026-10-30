@@ -1,0 +1,25 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Run application locally with hot-reload
+    cmds:
+      - go mod tidy
+      - air
+  build:
+    desc: Builds the relay binary
+    cmd: go build -ldflags="-s -w" -trimpath -o bin/relay ./cmd/relay
+    silent: true
+  lint:
+    desc: Runs linter
+    cmds:
+      - go fmt ./...
+      - golangci-lint run ./...
+  lint:fix:
+    desc: Runs linter with auto-fix
+    cmds:
+      - go fmt ./...
+      - golangci-lint run --fix ./...
+  test:
+    desc: Runs tests
+    cmd: go test -race ./...

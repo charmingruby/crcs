@@ -16,33 +16,33 @@ var (
 )
 
 type Contender struct {
-	FirstName          string               `json:"first_name"           db:"first_name"`
+	Birthdate          time.Time    `json:"birthdate"            db:"birthdate"`
+	Gender             *enum.Gender `json:"gender"               db:"gender"`
+	Nickname           *string      `json:"nickname"             db:"nickname"`
+	Model              ` db:",inline"`
 	LastName           string               `json:"last_name"            db:"last_name"`
-	Nickname           *string              `json:"nickname"             db:"nickname"`
-	Birthdate          time.Time            `json:"birthdate"            db:"birthdate"`
 	PlaceOfBirth       string               `json:"place_of_birth"       db:"place_of_birth"`
 	CurrentWeightClass enum.WeightClass     `json:"current_weight_class" db:"current_weight_class"`
+	FirstName          string               `json:"first_name"           db:"first_name"`
+	SeasonID           string               `json:"season_id"            db:"season_id"`
+	Status             enum.ContenderStatus `json:"status"               db:"status"`
 	Reach              int                  `json:"reach"                db:"reach"`
 	Height             int                  `json:"height"               db:"height"`
 	Weight             int                  `json:"weight"               db:"weight"`
-	Gender             *enum.Gender         `json:"gender"               db:"gender"`
-	SeasonID           string               `json:"season_id"            db:"season_id"`
-	Status             enum.ContenderStatus `json:"status"               db:"status"`
-	Model              `                        db:",inline"`
 }
 
 type ContenderInput struct {
+	Birthdate          time.Time
+	Nickname           *string
 	FirstName          string
 	LastName           string
-	Nickname           *string
-	Birthdate          time.Time
 	PlaceOfBirth       string
 	CurrentWeightClass string
+	Gender             string
+	SeasonID           string
 	Reach              int
 	Height             int
 	Weight             int
-	Gender             string
-	SeasonID           string
 }
 
 func NewContender(input ContenderInput) (*Contender, error) {

@@ -43,7 +43,14 @@ func (r *Reader) Consume(ctx context.Context, handle func(ctx context.Context, m
 			continue
 		}
 
-		if err := handle(ctx, Message{Topic: m.Topic, Key: m.Key, Value: m.Value}); err != nil {
+		id := fmt.Sprintf("%s:%d:%d", m.Topic, m.Partition, m.Offset)
+		for _, header := range m.Headers {
+			if header.Key == "event_id" && len(header.Value) > 0 {
+				id = string(header.Value)
+				break
+			}
+		}
+		if err := handle(ctx, Message{ID: id, Topic: m.Topic, Key: m.Key, Value: m.Value}); err != nil {
 			return fmt.Errorf("kafka: handle message: %w", err)
 		}
 

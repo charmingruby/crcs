@@ -11,29 +11,29 @@ import (
 )
 
 type MatchResultV1 struct {
+	CreatedAt       time.Time `json:"created_at"`
+	WinnerID        *string   `json:"winner_id"`
 	ID              string    `json:"id"`
 	MatchID         string    `json:"match_id"`
-	WinnerID        *string   `json:"winner_id"`
 	Outcome         string    `json:"outcome"`
 	Method          string    `json:"method"`
 	FightDuration   int       `json:"fight_duration"`
 	ScheduledRounds int       `json:"scheduled_rounds"`
 	ActualRounds    int       `json:"actual_rounds"`
-	CreatedAt       time.Time `json:"created_at"`
 }
 
 type MatchV1 struct {
+	CreatedAt           time.Time      `json:"created_at"`
+	Gender              *string        `json:"gender"`
+	Result              *MatchResultV1 `json:"result"`
+	UpdatedAt           *time.Time     `json:"updated_at"`
 	ID                  string         `json:"id"`
 	SeasonID            string         `json:"season_id"`
-	Week                int            `json:"week"`
-	Position            int            `json:"position"`
 	FavoriteContenderID string         `json:"favorite_contender_id"`
 	UnderdogContenderID string         `json:"underdog_contender_id"`
 	WeightClass         string         `json:"weight_class"`
-	Gender              *string        `json:"gender"`
-	Result              *MatchResultV1 `json:"result"`
-	CreatedAt           time.Time      `json:"created_at"`
-	UpdatedAt           *time.Time     `json:"updated_at"`
+	Week                int            `json:"week"`
+	Position            int            `json:"position"`
 }
 
 func (e *Endpoint) ListSeasonMatchesV1(w http.ResponseWriter, r *http.Request) {
