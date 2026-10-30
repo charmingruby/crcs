@@ -32,8 +32,8 @@ type CartelV1 struct {
 }
 
 type GetContenderV1Response struct {
-	Contender ContenderV1 `json:"contender"`
 	Cartel    *CartelV1   `json:"cartel"`
+	Contender ContenderV1 `json:"contender"`
 }
 
 func (e *Endpoint) GetContenderV1(w http.ResponseWriter, r *http.Request) {

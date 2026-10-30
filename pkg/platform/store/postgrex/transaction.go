@@ -37,7 +37,7 @@ func RunInTx(ctx context.Context, db Querier, fn func(*sqlx.Tx) error) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	err = fn(tx)
 

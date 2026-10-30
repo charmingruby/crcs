@@ -47,7 +47,7 @@ func (v *validator) validateSlice(s any) error {
 		item := items.Index(i).Interface()
 
 		if err := v.Validate(item); err != nil {
-			return fmt.Errorf("item %d: %s", i, err)
+			return fmt.Errorf("item %d: %w", i, err)
 		}
 	}
 

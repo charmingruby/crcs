@@ -80,8 +80,8 @@ func QueryInt(r *http.Request, key string, def int) (int, error) {
 	return value, nil
 }
 
-func Pagination(r *http.Request) (limit, offset int, err error) {
-	limit, err = QueryInt(r, "limit", DefaultLimit)
+func Pagination(r *http.Request) (int, int, error) {
+	limit, err := QueryInt(r, "limit", DefaultLimit)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -94,7 +94,7 @@ func Pagination(r *http.Request) (limit, offset int, err error) {
 		limit = MaxLimit
 	}
 
-	offset, err = QueryInt(r, "offset", 0)
+	offset, err := QueryInt(r, "offset", 0)
 	if err != nil {
 		return 0, 0, err
 	}
