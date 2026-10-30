@@ -26,6 +26,8 @@ func (s TaskStatus) CanTransitionTo(target TaskStatus) bool {
 		return target == CompletedTaskStatus || target == FailedTaskStatus
 	case FailedTaskStatus:
 		return target == RunningTaskStatus
+	case CompletedTaskStatus:
+		return false
 	default:
 		return false
 	}

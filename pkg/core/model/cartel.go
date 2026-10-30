@@ -51,6 +51,7 @@ func (c *Cartel) RegisterMatch(match *CartelMatch) {
 				c.WinsBySub++
 			case enum.DecisionFightMethod:
 				c.WinsByDec++
+			case enum.NoContestFightMethod:
 			}
 		case enum.LossFightOutcome:
 			c.Losses++
@@ -63,6 +64,7 @@ func (c *Cartel) RegisterMatch(match *CartelMatch) {
 				c.LossesBySub++
 			case enum.DecisionFightMethod:
 				c.LossesByDec++
+			case enum.NoContestFightMethod:
 			}
 		case enum.DrawFightOutcome:
 			c.Draws++
