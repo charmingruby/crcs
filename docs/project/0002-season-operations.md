@@ -31,6 +31,8 @@ data: seasons and matches belong to `matchmaking`; contenders belong to
   winner. A match accepts a single result (`409` afterwards).
 - Updates run through a transaction manager in each domain, since all three are
   read-modify-write flows.
+- Result recording locks the season before reading the match. Matchmaking uses
+  the same lock, preventing a result from being attached during replacement.
 - Recording a result does not touch the contender cartel: the cartel remains the
   worker's ingest responsibility, so a season result only affects scoring after
   it is re-ingested.

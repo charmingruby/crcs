@@ -17,6 +17,7 @@ type Listener struct {
 	seasonRepo    *repository.SeasonRepository
 	contenderRepo *repository.ContenderRepository
 	cartelRepo    *repository.CartelRepository
+	matchRepo     *repository.MatchRepository
 	taskRepo      *task.Repository
 	txManager     *repository.TransactionManager
 	machine       *fsm.FSM[machineState]
@@ -26,6 +27,7 @@ func New(
 	seasonRepo *repository.SeasonRepository,
 	contenderRepo *repository.ContenderRepository,
 	cartelRepo *repository.CartelRepository,
+	matchRepo *repository.MatchRepository,
 	taskRepo *task.Repository,
 	txManager *repository.TransactionManager,
 ) (*Listener, error) {
@@ -33,6 +35,7 @@ func New(
 		seasonRepo:    seasonRepo,
 		contenderRepo: contenderRepo,
 		cartelRepo:    cartelRepo,
+		matchRepo:     matchRepo,
 		taskRepo:      taskRepo,
 		txManager:     txManager,
 		machine:       newMachine(),
@@ -50,6 +53,7 @@ func (l *Listener) Handle(ctx context.Context, message season_matchmaking_reques
 		seasonRepo:    l.seasonRepo,
 		contenderRepo: l.contenderRepo,
 		cartelRepo:    l.cartelRepo,
+		matchRepo:     l.matchRepo,
 		taskRepo:      l.taskRepo,
 		txManager:     l.txManager,
 		seasonID:      message.SeasonID,

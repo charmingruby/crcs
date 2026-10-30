@@ -31,6 +31,7 @@ type machineState struct {
 	seasonRepo    *repository.SeasonRepository
 	contenderRepo *repository.ContenderRepository
 	cartelRepo    *repository.CartelRepository
+	matchRepo     *repository.MatchRepository
 	taskRepo      *task.Repository
 	txManager     *repository.TransactionManager
 	seasonID      string
@@ -103,7 +104,12 @@ func buildMatchmaking(ctx context.Context, state *machineState) (fsm.State, erro
 		return fsm.EmptyState, customerr.Internal("failed to find cartels", err)
 	}
 
-	matches, err := buildSchedule(season, contenders, cartels)
+	preserved, err := state.matchRepo.FindWithResults(ctx, state.seasonID)
+	if err != nil {
+		return fsm.EmptyState, customerr.Internal("failed to find matches with results", err)
+	}
+
+	matches, err := buildSchedule(season, contenders, cartels, preserved)
 	if err != nil {
 		return fsm.EmptyState, customerr.Internal("failed to build matchmaking schedule", err)
 	}

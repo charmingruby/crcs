@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"crcs/platform/messaging"
 
 	"crcs/platform/messaging/broker/kafka"
 	"crcs/platform/o11y/logging"
@@ -33,6 +34,7 @@ func (k *Kafka) Publish(ctx context.Context, topic, key string, event any) error
 	}
 
 	if err := k.writer.Publish(ctx, kafka.Message{
+		ID:    messaging.MessageID(ctx),
 		Topic: topic,
 		Key:   []byte(key),
 		Value: value,

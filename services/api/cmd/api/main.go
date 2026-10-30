@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"crcs/platform/httpx"
-	"crcs/platform/messaging/broker/kafka"
-	"crcs/platform/messaging/publisher"
 
 	"crcs/platform/o11y/logging"
 	"crcs/platform/store/postgrex"
@@ -23,6 +21,7 @@ import (
 	"github.com/charmingruby/crcs/services/api/internal/platform/config"
 
 	"github.com/charmingruby/crcs/services/api/internal/roster"
+	"github.com/charmingruby/crcs/services/api/internal/shared/outbox"
 	"github.com/charmingruby/crcs/services/api/internal/task"
 )
 
@@ -59,13 +58,11 @@ func run() error {
 	}
 	log.Info("postgres: connected")
 
-	log.Info("kafka: creating producer...")
-
-	kafkaWriter := kafka.NewWriter(cfg.KafkaBrokers)
-
-	log.Info("kafka: producer created")
-
-	pub := publisher.NewKafka(kafkaWriter)
+	pub, err := outbox.NewPublisher(db)
+	if err != nil {
+		log.Error("outbox: publisher error", "error", err)
+		return err
+	}
 
 	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.JWTTTL)
 
@@ -98,7 +95,7 @@ func run() error {
 	}
 
 	shutdownErrCh := make(chan error, 1)
-	go shutdown(ctx, log, shutdownErrCh, srv, db, kafkaWriter)
+	go shutdown(ctx, log, shutdownErrCh, srv, db)
 
 	log.Info("server: running...", "port", cfg.Port)
 	if err := srv.Start(); err != nil {
@@ -124,7 +121,6 @@ func shutdown(
 	errCh chan error,
 	srv *httpx.Server,
 	db *sqlx.DB,
-	writer *kafka.Writer,
 ) {
 	<-ctx.Done()
 	log.Info("shutdown: signal received, starting graceful shutdown...")
@@ -143,10 +139,6 @@ func shutdown(
 	}
 
 	if closeErr := db.Close(); closeErr != nil {
-		err = errors.Join(err, closeErr)
-	}
-
-	if closeErr := writer.Close(); closeErr != nil {
 		err = errors.Join(err, closeErr)
 	}
 

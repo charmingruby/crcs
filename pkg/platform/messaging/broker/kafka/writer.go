@@ -21,8 +21,9 @@ func NewWriter(brokers []string) *Writer {
 	return &Writer{
 		w: &kafkago.Writer{
 			Addr:                   kafkago.TCP(brokers...),
-			Balancer:               &kafkago.LeastBytes{},
+			Balancer:               &kafkago.Hash{},
 			AllowAutoTopicCreation: true,
+			RequiredAcks:           kafkago.RequireAll,
 		},
 	}
 }
@@ -31,6 +32,9 @@ func (w *Writer) Publish(ctx context.Context, msgs ...Message) error {
 	batch := make([]kafkago.Message, len(msgs))
 	for i, m := range msgs {
 		batch[i] = kafkago.Message{Topic: m.Topic, Key: m.Key, Value: m.Value}
+		if m.ID != "" {
+			batch[i].Headers = []kafkago.Header{{Key: "event_id", Value: []byte(m.ID)}}
+		}
 	}
 
 	var err error

@@ -78,11 +78,11 @@ func run() error {
 	readers := []*kafka.Reader{
 		listen(ctx, log, cfg, &wg, shutdownErrCh,
 			contenders_submitted_v1.Topic,
-			ingestListeners.OnContendersSubmittedV1.Handle,
+			ingestListeners.OnContendersSubmittedV1,
 		),
 		listen(ctx, log, cfg, &wg, shutdownErrCh,
 			season_matchmaking_requested_v1.Topic,
-			matchmakingListeners.OnSeasonMatchmakingRequestedV1.Handle,
+			matchmakingListeners.OnSeasonMatchmakingRequestedV1,
 		),
 	}
 

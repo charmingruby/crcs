@@ -32,6 +32,15 @@ func (u *Usecase) RecordMatchResult(
 	var output RecordMatchResultOutput
 
 	err := u.txManager.Transact(ctx, func(tx repository.Transaction) error {
+		season, err := tx.SeasonRepository.LockByID(ctx, input.SeasonID)
+		if err != nil {
+			return customerr.Internal("failed to lock season", err)
+		}
+
+		if season == nil {
+			return customerr.NotFound("match not found")
+		}
+
 		match, err := tx.MatchRepository.FindByID(ctx, input.SeasonID, input.MatchID)
 		if err != nil {
 			return customerr.Internal("failed to find match by id", err)

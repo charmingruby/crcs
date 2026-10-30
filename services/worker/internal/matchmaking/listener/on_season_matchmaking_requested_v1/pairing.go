@@ -29,7 +29,22 @@ func buildSchedule(
 	season *model.Season,
 	contenders []*model.Contender,
 	cartels []*model.Cartel,
+	preserved []*model.Match,
 ) ([]*model.Match, error) {
+	weeks := max(season.Weeks, 1)
+	occupied := make([]map[int]bool, weeks)
+	used := make(map[string]bool, len(preserved)*2)
+	for i := range occupied {
+		occupied[i] = make(map[int]bool)
+	}
+	for _, match := range preserved {
+		used[match.FavoriteContenderID] = true
+		used[match.UnderdogContenderID] = true
+		if match.Week > 0 && match.Week <= weeks {
+			occupied[match.Week-1][match.Position] = true
+		}
+	}
+
 	cartelsByContenderID := make(map[string]*model.Cartel, len(cartels))
 	for _, cartel := range cartels {
 		cartelsByContenderID[cartel.ContenderID] = cartel
@@ -37,7 +52,7 @@ func buildSchedule(
 
 	divisions := make(map[string][]seededContender)
 	for _, contender := range contenders {
-		if contender.Gender == nil {
+		if contender.Gender == nil || used[contender.ID] {
 			continue
 		}
 
@@ -70,15 +85,20 @@ func buildSchedule(
 
 	sortFights(fights)
 
-	cards := distributeWeeks(fights, season.Weeks)
+	cards := distributeWeeks(fights, occupied)
 
 	matches := make([]*model.Match, 0, len(fights))
 	for weekIndex, card := range cards {
-		for position, fight := range orderCard(card) {
+		position := 0
+		for _, fight := range orderCard(card) {
+			position++
+			for occupied[weekIndex][position] {
+				position++
+			}
 			match, err := model.NewMatch(model.MatchInput{
 				SeasonID:            season.ID,
 				Week:                weekIndex + 1,
-				Position:            position + 1,
+				Position:            position,
 				FavoriteContenderID: fight.favorite.contender.ID,
 				UnderdogContenderID: fight.underdog.contender.ID,
 				WeightClass:         fight.weightClass,
@@ -174,12 +194,12 @@ func fightAppeal(favoriteScore, underdogScore int) int {
 // distributeWeeks spreads fights round-robin across the season, never putting
 // more than maxFightsPerWeek on a single card. Fights beyond the season
 // capacity are dropped from the tail (lowest appeal first).
-func distributeWeeks(fights []fight, weeks int) [][]fight {
-	if weeks <= 0 {
-		weeks = 1
-	}
-
+func distributeWeeks(fights []fight, occupied []map[int]bool) [][]fight {
+	weeks := len(occupied)
 	capacity := weeks * maxFightsPerWeek
+	for _, positions := range occupied {
+		capacity -= len(positions)
+	}
 	if len(fights) > capacity {
 		fights = fights[:capacity]
 	}
@@ -188,7 +208,7 @@ func distributeWeeks(fights []fight, weeks int) [][]fight {
 	cursor := 0
 
 	for _, fight := range fights {
-		for len(cards[cursor]) >= maxFightsPerWeek {
+		for len(cards[cursor])+len(occupied[cursor]) >= maxFightsPerWeek {
 			cursor = (cursor + 1) % weeks
 		}
 

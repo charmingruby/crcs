@@ -6,4 +6,5 @@ use (
 	./pkg/platform
 	./services/api
 	./services/worker
+	./services/outbox
 )
