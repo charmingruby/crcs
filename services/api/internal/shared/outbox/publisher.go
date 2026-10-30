@@ -3,6 +3,7 @@ package outbox
 import (
 	"context"
 	"crcs/core/model"
+	"crcs/platform/o11y/logging"
 	"crcs/platform/store/postgrex"
 	"encoding/json"
 	"fmt"
@@ -33,5 +34,17 @@ func (p *Publisher) Publish(ctx context.Context, topic, key string, event any) e
 		return fmt.Errorf("outbox: marshal event: %w", err)
 	}
 
-	return postgrex.Exec(ctx, p.stmts, enqueueQuery, model.NewID(), topic, key, json.RawMessage(payload))
+	id := model.NewID()
+
+	if err := postgrex.Exec(ctx, p.stmts, enqueueQuery, id, topic, key, json.RawMessage(payload)); err != nil {
+		return err
+	}
+
+	logging.LoggerFromContext(ctx).Info("outbox: event enqueued",
+		"event_id", id,
+		"topic", topic,
+		"key", key,
+	)
+
+	return nil
 }
